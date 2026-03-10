@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Ellipse from '@/assets/icons/Ellipse.svg';
 
 export const Wrapper = styled.div`
   display: flex;
@@ -98,6 +99,10 @@ export const Requirement = styled.div<{ $hasErrors: boolean }>`
   width: 100%;
   height: 26px;
 
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
   span {
     font-size: 16px;
     font-family: var(--font-lato);
@@ -105,6 +110,13 @@ export const Requirement = styled.div<{ $hasErrors: boolean }>`
     color: ${({ $hasErrors, theme }) =>
       $hasErrors ? theme.colors.error : theme.colors.primary100};
   }
+`;
+
+export const EllipseIcon = styled(Ellipse)<{ $hasError: boolean }>`
+  width: 6px;
+  height: 6px;
+  color: ${({ $hasError, theme }) =>
+    $hasError ? theme.colors.error : theme.colors.primary100};
 `;
 
 export const ButtonGroup = styled.div`
