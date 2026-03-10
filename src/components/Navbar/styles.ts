@@ -63,7 +63,7 @@ export const NavLink = styled(Link)`
 
   svg {
     font-size: 1.75rem;
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary100};
   }
 
   transition: all 0.2s;
@@ -85,21 +85,21 @@ export const NavLinkIcon = styled.div<NavLinkProps>`
 
   border-radius: 0.5rem;
   background: ${({ selected, theme }) =>
-    selected ? theme.colors.primary : 'transparent'};
+    selected ? theme.colors.primary100 : 'transparent'};
 
   text-decoration: none;
 
   svg {
     font-size: 1.75rem;
     color: ${({ selected, theme }) =>
-      selected ? theme.colors.white : theme.colors.primary};
+      selected ? theme.colors.white : theme.colors.primary100};
   }
 
   transition: all 0.2s;
 
   &:focus,
   &:hover {
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.colors.primary100};
     color: ${({ theme }) => theme.colors.white};
 
     svg {
@@ -112,7 +112,7 @@ export const NavLinkText = styled.p<NavLinkProps>`
   font-size: 1rem;
   font-weight: 600;
   color: ${({ theme, selected }) =>
-    selected ? theme.colors.primary : theme.colors.default};
+    selected ? theme.colors.primary100 : theme.colors.success};
   overflow: hidden;
   white-space: nowrap;
   transition: all 0.2s;
@@ -163,10 +163,10 @@ export const LogoutButton = styled.button`
 
   font-size: 1rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary100};
 
   svg {
     font-size: 1.4rem;
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary100};
   }
 `;
