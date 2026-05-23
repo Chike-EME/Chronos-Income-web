@@ -59,7 +59,7 @@ export const Header = styled.div`
 
 export const Title = styled.div`
   font-family: var(--font-poppins);
-  color: ${({ theme }) => theme.colors.neutral100};
+  color: ${({ theme }) => theme.colors.neutral[100]};
   width: 500px;
 
   display: flex;
@@ -89,15 +89,15 @@ export const Button = styled.button`
 
   &.outline {
     background: ${({ theme }) => theme.colors.white};
-    border: solid 1px ${({ theme }) => theme.colors.primary100};
-    color: ${({ theme }) => theme.colors.primary100};
+    border: solid 1px ${({ theme }) => theme.colors.primary[100]};
+    color: ${({ theme }) => theme.colors.primary[100]};
     &:hover {
       background: rgba(26 64 41 20%);
     }
   }
 
   &.colored {
-    background: ${({ theme }) => theme.colors.primary100};
+    background: ${({ theme }) => theme.colors.primary[100]};
     border: none;
     color: ${({ theme }) => theme.colors.white};
     &:hover {
@@ -106,10 +106,10 @@ export const Button = styled.button`
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.neutral60};
+    background-color: ${({ theme }) => theme.colors.neutral[60]};
     border: none;
     &:hover {
-      background-color: ${({ theme }) => theme.colors.neutral60};
+      background-color: ${({ theme }) => theme.colors.neutral[60]};
       cursor: not-allowed;
     }
   }
@@ -122,7 +122,7 @@ export const Label = styled.p`
   display: flex;
   align-items: center;
 
-  color: ${({ theme }) => theme.colors.neutral80};
+  color: ${({ theme }) => theme.colors.neutral[80]};
 
   font-size: 16px;
   font-family: var(--font-poppins);
@@ -134,7 +134,7 @@ export const Input = styled.input.withConfig({
 })<{ hasError?: boolean }>`
   border: 1px solid
     ${({ theme, hasError }) =>
-      hasError ? theme.colors.error : theme.colors.neutral20};
+      hasError ? theme.colors.error : theme.colors.neutral[20]};
   background: ${({ theme }) => theme.colors.white};
   border-radius: 8px;
 
@@ -146,11 +146,11 @@ export const Input = styled.input.withConfig({
   font-size: 16px;
   font-family: var(--font-lato);
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.neutral80};
+  color: ${({ theme }) => theme.colors.neutral[80]};
   outline: none;
 
   &::placeholder {
-    color: ${({ theme }) => theme.colors.neutral20};
+    color: ${({ theme }) => theme.colors.neutral[20]};
     font-weight: 400;
   }
 
@@ -177,7 +177,7 @@ export const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   min-width: 24px;
   min-height: 24px;
 
-  border: 1px solid ${({ theme }) => theme.colors.primary100};
+  border: 1px solid ${({ theme }) => theme.colors.primary[100]};
   border-radius: 4px;
 
   cursor: pointer;
@@ -202,13 +202,13 @@ export const Checkbox = styled.input.attrs({ type: 'checkbox' })`
 `;
 
 export const DividerHorizontal = styled.hr`
-  border: 1px solid ${({ theme }) => theme.colors.secondary20};
+  border: 1px solid ${({ theme }) => theme.colors.secondary[20]};
 `;
 
 export const DividerVertical = styled.div`
   width: 1px;
   height: auto;
-  background-color: ${({ theme }) => theme.colors.secondary20};
+  background-color: ${({ theme }) => theme.colors.secondary[20]};
   align-self: stretch;
   margin-left: 28px;
   margin-right: 28px;

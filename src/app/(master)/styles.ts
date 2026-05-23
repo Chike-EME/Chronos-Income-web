@@ -4,8 +4,6 @@ export const MasterLayoutContainer = styled.div`
   width: 100%;
   height: 100vh;
 
-  padding: 0;
-
   display: flex;
   align-items: stretch;
 
@@ -14,8 +12,7 @@ export const MasterLayoutContainer = styled.div`
 
 export const MasterLayoutContent = styled.div`
   width: 100%;
+  margin-left: 88px;
   overflow: auto;
-
-  display: flex;
   flex-direction: column;
 `;
