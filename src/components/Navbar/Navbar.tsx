@@ -1,59 +1,107 @@
-import { useState } from 'react';
-import { IoConstructSharp, IoFlashSharp, IoLogOut } from 'react-icons/io5';
+// navbar/index.tsx
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-
 import { useAuth } from '@/hooks/useAuth';
-
 import {
-  LogoButton,
-  LogoImg,
-  LogoTextImg,
+  ButtonsContainer,
+  Container,
+  LogoContainer,
+  NavbarButton,
   LogoutButton,
-  Nav,
-  NavLink,
-  NavLinkIcon,
-  NavLinkText,
-  NavbarContainer,
+  Wrapper,
 } from './styles';
 
-const Navbar = () => {
-  const { logout } = useAuth();
+const navItems = [
+  {
+    href: '/calendario',
+    label: 'Calendário',
+    icon: '/img/navbar/CalendarIcon.svg',
+  },
+  {
+    href: '/clientes',
+    label: 'Clientes',
+    icon: '/img/navbar/ClientsIcon.svg',
+  },
+  {
+    href: '/relatorios',
+    label: 'Relatórios',
+    icon: '/img/navbar/ReportsIcon.svg',
+  },
+  {
+    href: '/invoice',
+    label: 'Invoice',
+    icon: '/img/navbar/InvoiceIcon.svg',
+  },
+];
 
+export default function Navbar() {
+  const { logout } = useAuth();
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const navbarRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const navbar = navbarRef.current;
+    if (!navbar) return;
+
+    const handleMouseEnter = () => setExpanded(true);
+    const handleMouseLeave = () => setExpanded(false);
+
+    navbar.addEventListener('mouseenter', handleMouseEnter);
+    navbar.addEventListener('mouseleave', handleMouseLeave);
+
+    return () => {
+      navbar.removeEventListener('mouseenter', handleMouseEnter);
+      navbar.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, []);
 
   return (
-    <NavbarContainer>
-      <LogoButton type="button" onClick={() => setExpanded(prev => !prev)}>
-        imagem aqui
-      </LogoButton>
+    <Wrapper ref={navbarRef} $open={expanded}>
+      <Container $grow>
+        <LogoContainer>
+          <img
+            className={`logo expanded ${expanded ? 'visible' : ''}`}
+            src="/img/navbar/LogoExpanded.svg"
+            alt="Chronos Income"
+          />
 
-      <Nav open={expanded}>
-        <NavLink href="/home">
-          <NavLinkIcon selected={pathname.startsWith('/home')}>
-            <IoFlashSharp />
-          </NavLinkIcon>
-          <NavLinkText selected={pathname.startsWith('/home')}>
-            Home
-          </NavLinkText>
-        </NavLink>
+          <img
+            className={`logo mini ${!expanded ? 'visible' : ''}`}
+            src="/img/navbar/LogoMini.svg"
+            alt="Chronos Income"
+          />
+        </LogoContainer>
+        <ButtonsContainer>
+          {navItems.map(({ href, label, icon }) => (
+            <NavbarButton
+              key={href}
+              href={href}
+              $open={expanded}
+              $active={pathname === href}
+            >
+              <img src={icon} alt={label} width={24} height={24} />
+              {expanded && <span className="label">{label}</span>}
+            </NavbarButton>
+          ))}
+        </ButtonsContainer>
+      </Container>
 
-        <NavLink href="/live">
-          <NavLinkIcon selected={pathname.startsWith('/live')}>
-            <IoConstructSharp />
-          </NavLinkIcon>
-          <NavLinkText selected={pathname.startsWith('/live')}>
-            Tela 2
-          </NavLinkText>
-        </NavLink>
-      </Nav>
-
-      <LogoutButton type="button" onClick={logout}>
-        <IoLogOut />
-        {expanded && 'Sair'}
-      </LogoutButton>
-    </NavbarContainer>
+      <Container>
+        <ButtonsContainer>
+          <LogoutButton onClick={logout} $open={expanded}>
+            <img
+              src="/img/navbar/ExitIcon.svg"
+              alt="Sair"
+              width={24}
+              height={24}
+            />
+            {expanded && <span className="label">Sair</span>}
+          </LogoutButton>
+        </ButtonsContainer>
+      </Container>
+    </Wrapper>
   );
-};
-
-export default Navbar;
+}

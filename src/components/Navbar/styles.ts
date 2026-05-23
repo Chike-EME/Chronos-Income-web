@@ -1,172 +1,156 @@
+// navbar/styles.ts
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
 
-export const NavbarContainer = styled.div`
+interface NavbarProps {
+  $open: boolean;
+}
+
+interface ContainerProps {
+  $grow?: boolean;
+}
+
+interface NavbarButtonProps extends NavbarProps {
+  $active?: boolean;
+}
+
+export const Wrapper = styled.div<NavbarProps>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+
+  width: ${({ $open }) => ($open ? '260px' : '88px')};
   height: 100%;
 
-  background-color: ${({ theme }) => theme.colors.white};
+  flex-shrink: 0;
+
+  background-color: ${({ theme }) => theme.colors.primary[80]};
   box-shadow: 0px 4px 16px 0px #00000029;
 
-  padding-top: min(6vh, 4.25rem);
-  padding-bottom: 2.375rem;
+  padding: 32px 8px;
 
   display: flex;
-  align-items: center;
   flex-direction: column;
-`;
+  justify-content: space-between;
 
-export const LogoButton = styled.button`
-  border: none;
-  background: transparent;
-
-  display: flex;
-  align-items: center;
-`;
-
-export const LogoImg = styled.img`
-  height: 38px;
-  object-fit: cover;
-  object-position: center;
-`;
-
-interface LogoTextImgProps {
-  open: boolean;
-}
-
-export const LogoTextImg = styled.img<LogoTextImgProps>`
-  max-width: ${({ open }) => (open ? '202px' : '0px')};
-  visibility: ${({ open }) => (open ? 'visible' : 'hidden')};
-  padding-left: ${({ open }) => (open ? '0.5rem' : '0')};
+  transition: width 0.25s ease;
   overflow: hidden;
-
-  height: 26px;
-  object-fit: cover;
-  object-position: center;
-
-  transition: all 0.2s;
 `;
 
-export const NavLink = styled(Link)`
-  position: relative;
-
-  padding: 0 1rem;
-  height: 3.5rem;
+export const Container = styled.div<ContainerProps>`
   width: 100%;
-
-  display: flex;
-  align-items: center;
-
-  border-radius: 0.5rem;
-  background: transparent;
-
-  text-decoration: none;
-
-  svg {
-    font-size: 1.75rem;
-    color: ${({ theme }) => theme.colors.primary100};
-  }
-
-  transition: all 0.2s;
+  ${({ $grow }) =>
+    $grow &&
+    css`
+      flex: 1;
+    `}
 `;
 
-interface NavLinkProps {
-  selected: boolean;
-}
-
-export const NavLinkIcon = styled.div<NavLinkProps>`
+export const LogoContainer = styled.div`
   position: relative;
 
-  height: 35px;
-  width: 35px;
+  height: 109px;
+  margin-bottom: 71px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 0.5rem;
-  background: ${({ selected, theme }) =>
-    selected ? theme.colors.primary100 : 'transparent'};
+  .logo {
+    position: absolute;
 
-  text-decoration: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
 
-  svg {
-    font-size: 1.75rem;
-    color: ${({ selected, theme }) =>
-      selected ? theme.colors.white : theme.colors.primary100};
+    opacity: 0;
+    pointer-events: none;
   }
 
-  transition: all 0.2s;
+  .logo.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
 
-  &:focus,
-  &:hover {
-    background: ${({ theme }) => theme.colors.primary100};
-    color: ${({ theme }) => theme.colors.white};
+  .expanded {
+    width: 228px;
+    height: 109px;
 
-    svg {
-      color: ${({ theme }) => theme.colors.white};
-    }
+    transform: scale(0.95);
+  }
+
+  .mini {
+    width: 72px;
+    height: 72px;
+
+    transform: scale(0.85);
   }
 `;
 
-export const NavLinkText = styled.p<NavLinkProps>`
-  font-size: 1rem;
-  font-weight: 600;
-  color: ${({ theme, selected }) =>
-    selected ? theme.colors.primary100 : theme.colors.success};
-  overflow: hidden;
-  white-space: nowrap;
-  transition: all 0.2s;
-`;
-
-interface NavProps {
-  open: boolean;
-}
-
-export const Nav = styled.nav<NavProps>`
-  margin-top: min(6vh, 6.625rem);
-
-  width: fit-content;
-
-  padding-left: 1.2rem;
-  padding-right: 1.5rem;
-
+export const ButtonsContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-
-  ${({ open }) =>
-    open
-      ? css`
-          ${NavLinkText} {
-            padding-left: 0.5rem;
-            visibility: visible;
-            max-width: 15.625rem;
-          }
-        `
-      : css`
-          ${NavLinkText} {
-            max-width: 0px;
-            padding: 0;
-
-            visibility: hidden;
-          }
-        `}
+  gap: 12px;
 `;
 
-export const LogoutButton = styled.button`
-  border: none;
-  background: transparent;
+const buttonBase = css<NavbarProps>`
+  position: relative;
+  padding: 0 1rem;
+  height: 40px;
+  width: calc(100%-16px);
+  margin: 0px 8px;
 
-  margin-top: auto;
   display: flex;
   align-items: center;
+  gap: 8px;
 
-  font-size: 1rem;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.primary100};
+  border-radius: 8px;
+  background: ${({ theme }) => theme.colors.primary[40]};
+  border: none;
+  cursor: pointer;
 
-  svg {
+  text-decoration: none;
+  white-space: nowrap;
+
+  .icon {
     font-size: 1.4rem;
-    color: ${({ theme }) => theme.colors.primary100};
+    flex-shrink: 0;
+  }
+
+  .label {
+    font-size: 0.95rem;
+    color: ${({ theme }) => theme.colors.primary[100]};
+    opacity: ${({ $open }) => ($open ? 1 : 0)};
+    transition: opacity 0.15s ease;
+  }
+
+  transition: background 0.2s;
+
+  &:hover {
+    background: ${({ theme }) =>
+      theme.colors.primary[60] ?? 'rgba(255,255,255,0.08)'};
+  }
+`;
+
+export const NavbarButton = styled(Link)<NavbarButtonProps>`
+  ${buttonBase}
+
+  ${({ $active, theme }) =>
+    $active &&
+    css`
+      background: ${theme.colors.primary[60] ??
+      'rgba(255,255,255,0.15)'};
+    `}
+`;
+
+export const LogoutButton = styled.button<NavbarProps>`
+  ${buttonBase}
+
+  .label {
+    color: ${({ theme }) => theme.colors.error ?? '#ff6b6b'};
+  }
+
+  &:hover {
+    background: rgba(255, 107, 107, 0.1);
   }
 `;
