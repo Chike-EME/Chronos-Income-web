@@ -12,6 +12,7 @@ import {
   LogoutButton,
   Wrapper,
 } from './styles';
+import { Modal } from '../Modals';
 
 const navItems = [
   {
@@ -41,6 +42,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
   const navbarRef = useRef<HTMLDivElement | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const navbar = navbarRef.current;
@@ -91,7 +93,10 @@ export default function Navbar() {
 
       <Container>
         <ButtonsContainer>
-          <LogoutButton onClick={logout} $open={expanded}>
+          <LogoutButton
+            onClick={() => setShowModal(true)}
+            $open={expanded}
+          >
             <img
               src="/img/navbar/ExitIcon.svg"
               alt="Sair"
@@ -102,6 +107,18 @@ export default function Navbar() {
           </LogoutButton>
         </ButtonsContainer>
       </Container>
+      <Modal
+        isOpen={showModal}
+        variant="danger"
+        onClose={() => setShowModal(false)}
+        onConfirm={() => {
+          logout();
+        }}
+        customTitle="Sair"
+        message="Tem certeza que deseja sair da plataforma?"
+        customClose="Cancelar"
+        customConfirm="Sair"
+      />
     </Wrapper>
   );
 }
