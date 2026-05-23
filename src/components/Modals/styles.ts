@@ -31,7 +31,7 @@ export const ModalBox = styled.div`
     font-size: 20px;
     font-weight: 500;
     font-family: var(--font-poppins);
-    color: ${({ theme }) => theme.colors.neutral100};
+    color: ${({ theme }) => theme.colors.neutral[100]};
   }
 
   p,
@@ -39,7 +39,7 @@ export const ModalBox = styled.div`
     font-size: 16px;
     font-weight: 400;
     font-family: var(--font-lato);
-    color: ${({ theme }) => theme.colors.neutral80};
+    color: ${({ theme }) => theme.colors.neutral[80]};
     margin: 0;
   }
 `;
