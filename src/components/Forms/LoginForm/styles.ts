@@ -35,7 +35,7 @@ export const Right = styled.div`
   flex: 1;
   overflow: hidden;
   position: relative;
-  background-color: ${({ theme }) => theme.colors.primary40};
+  background-color: ${({ theme }) => theme.colors.primary[40]};
 `;
 
 export const FormContainer = styled.form`
@@ -76,7 +76,7 @@ export const Title = styled.h1`
   font-family: var(--font-poppins);
   font-weight: 600;
 
-  color: ${({ theme }) => theme.colors.primary100};
+  color: ${({ theme }) => theme.colors.primary[100]};
 `;
 
 export const InputContainer = styled.div`
@@ -90,7 +90,7 @@ export const RegisterText = styled.h3`
   width: 100%;
   font-size: 10pt;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.secondary100};
+  color: ${({ theme }) => theme.colors.secondary[100]};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -109,14 +109,14 @@ export const CheckboxLabel = styled.label`
   font-size: 16px;
   font-family: var(--font-poppins);
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.neutral80};
+  color: ${({ theme }) => theme.colors.neutral[80]};
 `;
 
 export const CheckboxLabelButton = styled.button`
   font-size: 16px;
   font-family: var(--font-poppins);
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.primary100};
+  color: ${({ theme }) => theme.colors.primary[100]};
   text-decoration: underline;
 
   background: none;

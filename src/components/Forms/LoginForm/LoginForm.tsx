@@ -51,7 +51,7 @@ const LoginForm = () => {
     email: string,
     password: string,
   ): boolean => {
-    return email === 'user@email.com' && password === 'Senha1!@';
+    return email === 'user@email.com' && password === '123@Pass';
   };
 
   const onSubmit: SubmitHandler<ILoginForm> = async data => {
@@ -81,7 +81,7 @@ const LoginForm = () => {
       );
       localStorage.setItem(localStorageKeys.refreshToken, '123');
 
-      router.push('/empreendimentos');
+      router.push('/calendario');
     } catch (error) {
       handleError(error);
       setModal(true);
