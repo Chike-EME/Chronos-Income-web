@@ -1,6 +1,6 @@
 'use client';
 
-import Header from '@/components/Header/Header';
+import Header from '@/components/Header';
 import { Wrapper } from './styles';
 
 export default function Invoice() {

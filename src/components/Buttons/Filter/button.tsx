@@ -6,7 +6,7 @@ type ButtonProps = {
 
 export function FilterButton({ onClick }: ButtonProps) {
   return (
-    <Wrapper>
+    <Wrapper onClick={onClick}>
       <img
         src="/img/FilterIcon.svg"
         alt="Filtrar"
