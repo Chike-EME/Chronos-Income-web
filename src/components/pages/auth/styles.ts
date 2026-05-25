@@ -9,7 +9,7 @@ export const Wrapper = styled.div`
   height: 100%;
   min-height: 100vh;
 
-  background-color: ${({ theme }) => theme.colors.primary40};
+  background-color: ${({ theme }) => theme.colors.primary[40]};
 `;
 
 export const Container = styled.form`
@@ -53,7 +53,7 @@ export const Title = styled.h1`
   font-size: 20px;
   margin-bottom: 12px;
 
-  color: ${({ theme }) => theme.colors.primary100};
+  color: ${({ theme }) => theme.colors.primary[100]};
 `;
 
 export const SubTitle = styled.p`
@@ -63,7 +63,7 @@ export const SubTitle = styled.p`
   font-weight: 400;
   font-size: 18px;
   margin-bottom: 32px;
-  color: ${({ theme }) => theme.colors.neutral80};
+  color: ${({ theme }) => theme.colors.neutral[80]};
 `;
 
 export const InputContainer = styled.div`
@@ -108,7 +108,7 @@ export const Requirement = styled.div<{ $hasErrors: boolean }>`
     font-family: var(--font-lato);
     font-weight: 600;
     color: ${({ $hasErrors, theme }) =>
-      $hasErrors ? theme.colors.error : theme.colors.primary100};
+      $hasErrors ? theme.colors.error : theme.colors.primary[100]};
   }
 `;
 
@@ -116,7 +116,7 @@ export const EllipseIcon = styled(Ellipse)<{ $hasError: boolean }>`
   width: 6px;
   height: 6px;
   color: ${({ $hasError, theme }) =>
-    $hasError ? theme.colors.error : theme.colors.primary100};
+    $hasError ? theme.colors.error : theme.colors.primary[100]};
 `;
 
 export const ButtonGroup = styled.div`
@@ -130,7 +130,7 @@ export const RegisterText = styled.h3`
   width: 100%;
   font-size: 10pt;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.secondary100};
+  color: ${({ theme }) => theme.colors.secondary[100]};
   cursor: pointer;
   display: flex;
   align-items: center;
