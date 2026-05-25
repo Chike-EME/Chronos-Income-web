@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 
 export const ButtonContainer = styled.div`
-  width: auto;
+  width: 280px;
   height: 44px;
 
   padding: 0 12px;
 
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
 
   background-color: ${({ theme }) => theme.colors.primary[20]};
