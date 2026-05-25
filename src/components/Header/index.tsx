@@ -7,19 +7,27 @@ import { FilterButton } from '../Buttons/Filter/button';
 
 interface HeaderProps {
   type: 'Calendário' | 'Clientes' | 'Invoice' | 'Relatórios';
-  buttonText: string | null;
+  buttonText?: string | null;
   onPrevMonth?: () => void;
   onNextMonth?: () => void;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  onSearch?: () => void;
+  onAddClick?: () => void;
+  onFilterClick?: () => void;
 }
 
 export default function Header({
   type,
   buttonText,
-  onNextMonth,
   onPrevMonth,
+  onNextMonth,
+  searchValue = '',
+  onSearchChange,
+  onSearch,
+  onAddClick,
+  onFilterClick,
 }: HeaderProps) {
-  const [search, setSearch] = useState('');
-  const [showFilter, setShowFilter] = useState(false);
   return (
     <Wrapper>
       <Title>{type}</Title>
@@ -33,26 +41,26 @@ export default function Header({
             />
             <AddButton
               label="Adicionar Projeto"
-              onClick={() => console.log('Adicionar Projeto')}
+              onClick={() => onAddClick?.()}
             />
           </>
         )}
+
         {type === 'Clientes' && (
           <>
             <SearchInput
-              value={search}
-              onChange={setSearch}
-              onSearch={() => setSearch}
+              value={searchValue}
+              onChange={onSearchChange ?? (() => {})}
+              onSearch={onSearch ?? (() => {})}
               placeholder="Pesquisar por cliente"
             />
             <AddButton
               label="Adicionar Cliente"
-              onClick={() => {
-                console.log('Adicinar Cliente');
-              }}
+              onClick={() => onAddClick?.()}
             />
           </>
         )}
+
         {type === 'Relatórios' && (
           <>
             <MonthNavigator
@@ -63,18 +71,19 @@ export default function Header({
             <Row>
               <AddButton
                 label="Gerar Relatório"
-                onClick={() => console.log('Gerar Relatório')}
+                onClick={() => onAddClick?.()}
               />
-              <FilterButton onClick={() => setShowFilter(true)} />
+              <FilterButton onClick={() => onFilterClick?.()} />
             </Row>
           </>
         )}
+
         {type === 'Invoice' && (
           <>
-            <div></div>
+            <div />
             <AddButton
               label={buttonText ?? ''}
-              onClick={() => console.log('Gerar Invoice')}
+              onClick={() => onAddClick?.()}
             />
           </>
         )}
