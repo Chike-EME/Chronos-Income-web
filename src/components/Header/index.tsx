@@ -80,9 +80,14 @@ export default function Header({
 
         {type === 'Invoice' && (
           <>
-            <div />
+            <SearchInput
+              value={searchValue}
+              onChange={onSearchChange ?? (() => {})}
+              onSearch={onSearch ?? (() => {})}
+              placeholder="Pesquisar por invoice"
+            />
             <AddButton
-              label={buttonText ?? ''}
+              label="Adicionar Invoice"
               onClick={() => onAddClick?.()}
             />
           </>

@@ -17,87 +17,44 @@ import {
   MetaItem,
   Description,
 } from './styles';
-
-interface Client {
-  id: string;
-  name: string;
-  cnpj: string;
-  projectCount: number;
-  description?: string;
-}
-
-const mockClients: Client[] = [
-  {
-    id: '1',
-    name: 'Ágatha Jamille',
-    cnpj: '586.653.474-12',
-    projectCount: 4,
-    description:
-      'Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
-  },
-  {
-    id: '2',
-    name: 'Carla Franco',
-    cnpj: '586.653.474-12',
-    projectCount: 5,
-    description:
-      'Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
-  },
-  {
-    id: '3',
-    name: 'Guilherme Mendes',
-    cnpj: '586.653.474-12',
-    projectCount: 5,
-    description:
-      'Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
-  },
-  {
-    id: '4',
-    name: 'João Gabriel',
-    cnpj: '586.653.474-12',
-    projectCount: 5,
-    description:
-      'Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
-  },
-  {
-    id: '5',
-    name: 'Matheus Ximenes',
-    cnpj: '586.653.474-12',
-    projectCount: 5,
-    description:
-      'Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum',
-  },
-];
+import { fetchClientDetails } from '@/components/services/clients/details/service';
+import { ClientDetailsModal } from '@/components/Modals/ClientDetails';
+import { ClientDetails } from '@/components/types/clients/details';
+import { useClients } from '@/components/services/clients';
+import { ClientsSkeleton } from '@/components/skeletons/clients';
 
 export default function Clientes() {
-  const [clients, setClients] = useState<Client[]>(mockClients);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [detailsModal, setDetailsModal] = useState<{
+    open: boolean;
+    client: ClientDetails | null;
+    loading: boolean;
+  }>({ open: false, client: null, loading: false });
 
-  const filtered = clients.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const { clients, isLoading, addClient, deleteClient } =
+    useClients(search);
 
   function handleAddClient(data: ClientFormData) {
-    setClients(prev => [
-      ...prev,
+    addClient.mutate(
       {
-        id: crypto.randomUUID(),
         name: data.name,
         cnpj: data.cnpj,
         projectCount: 0,
         description: data.description || undefined,
       },
-    ]);
-    setIsModalOpen(false);
+      { onSuccess: () => setIsModalOpen(false) },
+    );
   }
 
   function handleDelete(id: string) {
-    setClients(prev => prev.filter(c => c.id !== id));
+    deleteClient.mutate(id);
   }
 
-  function handleView(id: string) {
-    console.log('Ver cliente', id);
+  async function handleView(id: string) {
+    setDetailsModal({ open: true, client: null, loading: true });
+    const data = await fetchClientDetails(id);
+    setDetailsModal({ open: true, client: data, loading: false });
   }
 
   return (
@@ -111,57 +68,77 @@ export default function Clientes() {
       />
 
       <ScrollArea>
-        <Grid>
-          {filtered.map(client => (
-            <ClientCard key={client.id}>
-              <CardHeader>
-                <ClientName>{client.name}</ClientName>
-                <CardActions>
-                  <ActionButton
-                    onClick={() => handleView(client.id)}
-                    aria-label="Ver"
-                  >
-                    <img
-                      src="/img/ViewIcon.svg"
-                      alt="ver"
-                      width={20}
-                      height={20}
-                    />
-                  </ActionButton>
-                  <ActionButton
-                    $danger
-                    onClick={() => handleDelete(client.id)}
-                    aria-label="Excluir"
-                  >
-                    <img
-                      src="/img/TrashIcon.svg"
-                      alt="excluir"
-                      width={20}
-                      height={20}
-                    />
-                  </ActionButton>
-                </CardActions>
-              </CardHeader>
+        {isLoading ? (
+          <ClientsSkeleton />
+        ) : (
+          <Grid>
+            {clients.map(client => (
+              <ClientCard key={client.id}>
+                <CardHeader>
+                  <ClientName>{client.name}</ClientName>
+                  <CardActions>
+                    <ActionButton
+                      onClick={() => handleView(client.id)}
+                      aria-label="Ver"
+                    >
+                      <img
+                        src="/img/ViewIcon.svg"
+                        alt="ver"
+                        width={20}
+                        height={20}
+                      />
+                    </ActionButton>
+                    <ActionButton
+                      $danger
+                      onClick={() => handleDelete(client.id)}
+                      aria-label="Excluir"
+                    >
+                      <img
+                        src="/img/TrashIcon.svg"
+                        alt="excluir"
+                        width={20}
+                        height={20}
+                      />
+                    </ActionButton>
+                  </CardActions>
+                </CardHeader>
 
-              <CardMeta>
-                <MetaItem>CNPJ: {client.cnpj}</MetaItem>
-                <MetaItem>{client.projectCount} Projetos</MetaItem>
-              </CardMeta>
+                <CardMeta>
+                  <MetaItem>CNPJ: {client.cnpj}</MetaItem>
+                  <MetaItem>{client.projectCount} Projetos</MetaItem>
+                </CardMeta>
 
-              {client.description && (
-                <Description>
-                  Descrição: {client.description}
-                </Description>
-              )}
-            </ClientCard>
-          ))}
-        </Grid>
+                {client.description && (
+                  <Description>
+                    Descrição: {client.description}
+                  </Description>
+                )}
+              </ClientCard>
+            ))}
+          </Grid>
+        )}
       </ScrollArea>
 
       <AddClientModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddClient}
+      />
+
+      <ClientDetailsModal
+        isOpen={detailsModal.open}
+        onClose={() =>
+          setDetailsModal({
+            open: false,
+            client: null,
+            loading: false,
+          })
+        }
+        client={detailsModal.client}
+        loading={detailsModal.loading}
+        onAddProject={() =>
+          console.log('adicionar projeto ao cliente')
+        }
       />
     </Wrapper>
   );

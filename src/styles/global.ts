@@ -213,3 +213,54 @@ export const DividerVertical = styled.div`
   margin-left: 28px;
   margin-right: 28px;
 `;
+
+export const ProjectsRow = styled.div`
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 16px;
+
+  margin-top: 16px;
+
+  width: 100%;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const ClientInfo = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 28px 28px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  scrollbar-width: thin;
+  scrollbar-color: ${({ theme }) => theme.colors.primary[80]}
+    transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: ${({ theme }) =>
+      theme.colors.primary[40] ?? '#c5dcc4'};
+    border-radius: 99px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.primary[80]};
+    border-radius: 99px;
+  }
+`;

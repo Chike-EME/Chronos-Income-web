@@ -43,9 +43,10 @@ export const Grid = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 
-  /* último item sozinho fica na esquerda */
   & > :last-child:nth-child(odd) {
-    grid-column: 2 / 3;
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 8px);
   }
 `;
 
