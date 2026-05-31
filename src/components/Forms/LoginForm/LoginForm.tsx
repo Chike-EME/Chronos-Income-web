@@ -1,6 +1,6 @@
 'use-client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -8,7 +8,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ILoginForm, LoginSchema } from '@/validations/LoginSchema';
 import { localStorageKeys } from '@/utils/localStorageKeys';
 import { useAuth } from '@/hooks/useAuth';
-import handleError from '@/utils/handleToast';
 
 import {
   Container,
@@ -47,10 +46,7 @@ const LoginForm = () => {
     resolver: yupResolver(LoginSchema),
   });
 
-  const validateCredentials = (
-    email: string,
-    password: string,
-  ): boolean => {
+  const validateCredentials = (email: string, password: string): boolean => {
     return email === 'user@email.com' && password === '123@Pass';
   };
 
@@ -75,15 +71,10 @@ const LoginForm = () => {
       setUser(user);
 
       localStorage.setItem(localStorageKeys.accessToken, '123');
-      localStorage.setItem(
-        localStorageKeys.user,
-        JSON.stringify(user),
-      );
-      localStorage.setItem(localStorageKeys.refreshToken, '123');
+      localStorage.setItem(localStorageKeys.user, JSON.stringify(user));
 
       router.push('/calendario');
     } catch (error) {
-      handleError(error);
       setModal(true);
     } finally {
       setIsSubmitting(false);
