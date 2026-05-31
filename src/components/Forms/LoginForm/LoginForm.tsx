@@ -1,9 +1,10 @@
+// app/login/page.tsx
 'use-client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from 'react';
 
 import { ILoginForm, LoginSchema } from '@/validations/LoginSchema';
 import { localStorageKeys } from '@/utils/localStorageKeys';
@@ -28,14 +29,14 @@ import {
 } from './styles';
 import { Modal } from '@/components/Modals';
 import { Button, Checkbox, Input, Label } from '@/styles/global';
+import { useLogin } from '@/components/services/auth/useLogin';
 
 const LoginForm = () => {
   const router = useRouter();
   const { setUser } = useAuth();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [checked, setIsChecked] = useState(false);
-  const [show, setShow] = useState<boolean>(false);
+  const [show, setShow] = useState(false);
   const [modal, setModal] = useState(false);
 
   const {
@@ -46,48 +47,38 @@ const LoginForm = () => {
     resolver: yupResolver(LoginSchema),
   });
 
-  const validateCredentials = (email: string, password: string): boolean => {
-    return email === 'user@email.com' && password === '123@Pass';
-  };
-
-  const onSubmit: SubmitHandler<ILoginForm> = async data => {
-    try {
-      setIsSubmitting(true);
-
-      const isValid = validateCredentials(data.email, data.password);
-
-      if (!isValid) {
-        setModal(true);
-        return;
-      }
-
-      // login OK
-      const user = {
-        id: 1,
-        username: 'User Test',
-        email: data.email,
-      };
+  const { mutate: submitLogin, isPending } = useLogin({
+    onSuccess: data => {
+      const user = { username: data.name, email: data.email };
 
       setUser(user);
 
-      localStorage.setItem(localStorageKeys.accessToken, '123');
+      localStorage.setItem(localStorageKeys.accessToken, data.token);
       localStorage.setItem(localStorageKeys.user, JSON.stringify(user));
 
+      // "manter conectado" — persiste token em cookie de longa duração
+      if (checked) {
+        document.cookie = `${localStorageKeys.accessToken}=${
+          data.token
+        }; max-age=${60 * 60 * 24 * 30}; path=/`;
+      }
+
       router.push('/calendario');
-    } catch (error) {
-      setModal(true);
-    } finally {
-      setIsSubmitting(false);
-    }
+    },
+    onError: () => setModal(true),
+  });
+
+  const onSubmit: SubmitHandler<ILoginForm> = data => {
+    submitLogin({ email: data.email, password: data.password });
   };
 
   return (
     <Container>
       <Left>
         <ColorOverlay />
-
         <LogoImg src="/img/login/amico.svg" alt="Logo Central" />
       </Left>
+
       <Right>
         <FormContainer onSubmit={handleSubmit(onSubmit)}>
           <Logo src="/img/login/Logo.svg" alt="Chronos Income" />
@@ -112,29 +103,18 @@ const LoginForm = () => {
                 placeholder="Digite sua senha"
                 {...register('password')}
               />
-              {show ? (
-                <img
-                  src="/img/login/EyeOn.svg"
-                  className="icon"
-                  alt="Ocultar Senha"
-                  color="black"
-                  onClick={() => setShow(false)}
-                />
-              ) : (
-                <img
-                  src="/img/login/EyeOff.svg"
-                  className="icon"
-                  alt="Mostrar Senha"
-                  color="black"
-                  onClick={() => setShow(true)}
-                />
-              )}
+              <img
+                src={show ? '/img/login/EyeOn.svg' : '/img/login/EyeOff.svg'}
+                className="icon"
+                alt={show ? 'Ocultar Senha' : 'Mostrar Senha'}
+                onClick={() => setShow(s => !s)}
+              />
             </Field>
 
             <RegisterText>
               <Checkbox
                 checked={checked}
-                onChange={() => setIsChecked(!checked)}
+                onChange={() => setIsChecked(c => !c)}
               />
               <CheckboxText>
                 <CheckboxLabel>Manter conectado</CheckboxLabel>
@@ -147,19 +127,21 @@ const LoginForm = () => {
               </CheckboxText>
             </RegisterText>
           </InputContainer>
+
           <Button
             className="colored"
             type="submit"
             style={{ height: '46px' }}
-            disabled={isSubmitting}
+            disabled={isPending}
           >
-            Entrar
+            {isPending ? 'Entrando...' : 'Entrar'}
           </Button>
         </FormContainer>
       </Right>
+
       <Modal
         isOpen={modal}
-        variant={'danger'}
+        variant="danger"
         onClose={() => setModal(false)}
         onConfirm={() => setModal(false)}
         customTitle="Dados incorretos"

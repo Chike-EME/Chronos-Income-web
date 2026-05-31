@@ -2,6 +2,7 @@
 
 import { localStorageKeys } from '@/utils/localStorageKeys';
 import { usePathname, useRouter } from 'next/navigation';
+import { logout as logoutService } from '@/components/services/auth/service';
 import {
   createContext,
   ReactNode,
@@ -20,7 +21,7 @@ interface IUserProvider {
   user: User;
   setUser: React.Dispatch<SetStateAction<User>>;
   isAuthenticated: boolean;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 interface ChildrenProps {
@@ -51,7 +52,15 @@ const AuthProvider = ({ children }: ChildrenProps) => {
   // critério: token presente + email populado
   const isAuthenticated = !!user.email;
 
-  const logout = () => {
+  const logout = async () => {
+    const token = localStorage.getItem(localStorageKeys.accessToken);
+
+    if (token) {
+      await logoutService(token).catch(() => {
+        // ignora erro — limpa local mesmo se o back falhar
+      });
+    }
+
     localStorage.removeItem(localStorageKeys.user);
     localStorage.removeItem(localStorageKeys.accessToken);
     setUser({} as User);
@@ -59,9 +68,7 @@ const AuthProvider = ({ children }: ChildrenProps) => {
   };
 
   useEffect(() => {
-    // if (!loading && !isAuthenticated && !publicRoutes.includes(pathname)) {
-    if (false) {
-      // enquanto o back não funciona
+    if (!loading && !isAuthenticated && !publicRoutes.includes(pathname)) {
       router.push('/');
     }
   }, [loading, isAuthenticated, pathname]);

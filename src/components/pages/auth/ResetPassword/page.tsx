@@ -10,31 +10,23 @@ import {
   Logo,
   Requirement,
   RequirementsContainer,
-  SubTitle,
   Title,
-  TitleCard,
   Wrapper,
 } from '../styles';
 import { Button, ErrorMessage, Input, Label } from '@/styles/global';
 import { Modal } from '@/components/Modals';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useResetPassword } from '@/components/services/auth/useResetPassword';
 
-type ModalType =
-  | { type: 'none' }
-  | { type: 'success' }
-  | { type: 'error' }
-  | { type: 'diferentError' }
-  | { type: 'sameError' };
+type ModalType = { type: 'none' } | { type: 'success' } | { type: 'error' };
 
-export default function ForgotPassword() {
+export default function ResetPassword() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get('code');
+  const token = searchParams.get('token') ?? '';
 
-  const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState<ModalType>({ type: 'none' });
   const [triedSend, setTriedSend] = useState(false);
-
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNew, setShowNew] = useState(false);
@@ -44,45 +36,37 @@ export default function ForgotPassword() {
     confirm: '',
   });
 
-  const handleSubmit = async () => {
-    //if (!code) return;
+  const { mutate: submitReset, isPending } = useResetPassword({
+    onSuccess: () => setModal({ type: 'success' }),
+    onError: () => setModal({ type: 'error' }),
+  });
 
-    try {
-      setLoading(true);
-      setTriedSend(true);
-
-      if (!hasErrors()) {
-        setLoading(false);
-        return;
-      }
-
-      console.log(
-        'Payload: \n code:',
-        code,
-        'password:',
-        newPassword,
-        'passwordConfirmation:',
-        confirmPassword,
-      );
-
-      setModal({ type: 'success' });
-    } catch (error: any) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const hasErrors = () => {
-    const errors = {
-      new: [true, true, true, true],
-      confirm: '',
-    };
-
+  function validate(): boolean {
+    const errors = { new: [true, true, true, true], confirm: '' };
     let valid = true;
 
-    if (!confirmPassword && newPassword) {
-      // confirmation
+    if (!newPassword) {
+      setPasswordErrors(errors);
+      return false;
+    }
+    if (newPassword.length < 8) {
+      errors.new[0] = false;
+      valid = false;
+    }
+    if (!/(?=.*[A-Z])/.test(newPassword)) {
+      errors.new[1] = false;
+      valid = false;
+    }
+    if (!/(?=.*[a-z])/.test(newPassword)) {
+      errors.new[2] = false;
+      valid = false;
+    }
+    if (!/(?=.*[!@#$%&*(.).])/.test(newPassword)) {
+      errors.new[3] = false;
+      valid = false;
+    }
+
+    if (!confirmPassword) {
       errors.confirm = '*Confirme a nova senha.';
       valid = false;
     } else if (newPassword !== confirmPassword) {
@@ -90,55 +74,19 @@ export default function ForgotPassword() {
       valid = false;
     }
 
-    // empty password
-    if (!newPassword && !triedSend) {
-      setPasswordErrors(errors);
-      return valid;
-    } else if (newPassword.length < 8) {
-      // password less than 8
-      errors.new[0] = false;
-      valid = false;
-    }
-
-    // capital letters
-    if (!/(?=.*[A-Z])/.test(newPassword)) {
-      errors.new[1] = false;
-      valid = false;
-    }
-
-    // lowercase letters
-    if (!/(?=.*[a-z])/.test(newPassword)) {
-      errors.new[2] = false;
-      valid = false;
-    }
-
-    // special letters
-    if (!/(?=.*[!@#$%&*().])/.test(newPassword)) {
-      errors.new[3] = false;
-      valid = false;
-    }
-
     setPasswordErrors(errors);
     return valid;
-  };
+  }
 
   useEffect(() => {
-    console.log('antes:', passwordErrors);
-    hasErrors();
-    console.log('depois:', passwordErrors);
-  }, [newPassword]);
-
-  useEffect(() => {
-    if (triedSend) hasErrors();
+    if (triedSend) validate();
   }, [newPassword, confirmPassword]);
 
-  useEffect(() => {
-    if (triedSend) return;
-    if (newPassword !== '' && confirmPassword !== '') {
-      setTriedSend(true);
-      hasErrors();
-    }
-  }, [newPassword, confirmPassword]);
+  function handleSubmit() {
+    setTriedSend(true);
+    if (!validate()) return;
+    submitReset({ token, newPassword });
+  }
 
   return (
     <Wrapper>
@@ -152,48 +100,37 @@ export default function ForgotPassword() {
 
         <InputContainer style={{ marginBottom: '32px' }}>
           <Label>Insira a nova senha</Label>
-
           <InputWrapper style={{ marginBottom: '20px' }}>
             <Input
               type={showNew ? 'text' : 'password'}
               placeholder="Digite sua senha"
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
-              hasError={passwordErrors.new.some(e => e === false)}
+              hasError={passwordErrors.new.some(e => !e)}
             />
             <img
-              src={
-                showNew
-                  ? '/img/login/EyeOn.svg'
-                  : '/img/login/EyeOff.svg'
-              }
+              src={showNew ? '/img/login/EyeOn.svg' : '/img/login/EyeOff.svg'}
               className="icon"
-              alt="Ocultar Senha"
-              onClick={() => setShowNew(prev => !prev)}
+              alt="Mostrar/Ocultar"
+              onClick={() => setShowNew(p => !p)}
             />
           </InputWrapper>
 
           <RequirementsContainer style={{ marginBottom: '20px' }}>
-            <Requirement $hasErrors={!passwordErrors.new[0]}>
-              <EllipseIcon $hasError={!passwordErrors.new[0]} />
-              <span>8 Caracteres</span>
-            </Requirement>
-            <Requirement $hasErrors={!passwordErrors.new[1]}>
-              <EllipseIcon $hasError={!passwordErrors.new[1]} />
-              <span>1 Letra maiúscula</span>
-            </Requirement>
-            <Requirement $hasErrors={!passwordErrors.new[2]}>
-              <EllipseIcon $hasError={!passwordErrors.new[2]} />
-              <span>1 Letra minúscula</span>
-            </Requirement>
-            <Requirement $hasErrors={!passwordErrors.new[3]}>
-              <EllipseIcon $hasError={!passwordErrors.new[3]} />
-              <span>1 Caractere especial</span>
-            </Requirement>
+            {[
+              '8 Caracteres',
+              '1 Letra maiúscula',
+              '1 Letra minúscula',
+              '1 Caractere especial',
+            ].map((label, i) => (
+              <Requirement key={i} $hasErrors={!passwordErrors.new[i]}>
+                <EllipseIcon $hasError={!passwordErrors.new[i]} />
+                <span>{label}</span>
+              </Requirement>
+            ))}
           </RequirementsContainer>
 
           <Label>Confirmar nova senha</Label>
-
           <InputWrapper>
             <Input
               type={showConfirm ? 'text' : 'password'}
@@ -204,47 +141,42 @@ export default function ForgotPassword() {
             />
             <img
               src={
-                showConfirm
-                  ? '/img/login/EyeOn.svg'
-                  : '/img/login/EyeOff.svg'
+                showConfirm ? '/img/login/EyeOn.svg' : '/img/login/EyeOff.svg'
               }
               className="icon"
-              alt="Ocultar Senha"
-              color="black"
-              onClick={() => setShowConfirm(prev => !prev)}
+              alt="Mostrar/Ocultar"
+              onClick={() => setShowConfirm(p => !p)}
             />
-            {passwordErrors.confirm !== '' && (
+            {passwordErrors.confirm && (
               <ErrorMessage>{passwordErrors.confirm}</ErrorMessage>
             )}
           </InputWrapper>
         </InputContainer>
+
         <ButtonGroup>
           <Button
             className="colored"
             type="button"
             style={{ height: '46px' }}
-            disabled={loading}
+            disabled={isPending}
             onClick={handleSubmit}
           >
-            Salvar
+            {isPending ? 'Salvando...' : 'Salvar'}
           </Button>
         </ButtonGroup>
       </Container>
+
       <Modal
         isOpen={modal.type !== 'none'}
         variant={modal.type === 'success' ? 'success' : 'danger'}
         onClose={() => setModal({ type: 'none' })}
         onConfirm={() => {
           setModal({ type: 'none' });
-          if (modal.type === 'success') {
-            router.push('../');
-          }
+          if (modal.type === 'success') router.push('/');
         }}
         message={
           modal.type === 'success'
             ? 'Senha redefinida com sucesso!'
-            : modal.type === 'sameError'
-            ? 'A nova senha não pode ser igual a antiga!'
             : 'Erro ao redefinir senha, por favor tente novamente!'
         }
         customClose="none"
