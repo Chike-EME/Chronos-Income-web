@@ -9,3 +9,10 @@ export type Invoice = {
 export type FetchInvoicesResponse = {
   invoices: Invoice[];
 };
+
+export type GenerateInvoicePayload = {
+  dateFrom: string;
+  dateTo: string;
+  clientId: string;
+  projectId: string;
+};
