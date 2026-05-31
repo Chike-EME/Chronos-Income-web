@@ -4,8 +4,7 @@ export const ChartCard = styled.div`
   padding: 24px;
 
   background: ${({ theme }) => theme.colors.white};
-  border: 1px solid
-    ${({ theme }) => theme.colors.neutral[20] ?? '#eee'};
+  border: 1px solid ${({ theme }) => theme.colors.neutral[20] ?? '#eee'};
   border-radius: 18px;
 
   display: flex;

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import {
   ChartCard,
   ChartTitle,
@@ -126,10 +120,8 @@ export function ClientPieChart({
           </SkeletonLegend>
         </>
       ) : (
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart
-            margin={{ top: 20, right: 60, bottom: 20, left: 60 }}
-          >
+        <ResponsiveContainer width="100%" height={350}>
+          <PieChart margin={{ top: 10, right: 60, bottom: 10, left: 60 }}>
             <Pie
               data={data}
               dataKey="value"
