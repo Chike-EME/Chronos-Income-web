@@ -1,18 +1,18 @@
-export interface ProjectSelectOption {
+export type ProjectSelectOption = {
   id: string;
   name: string;
-}
+};
 
-export interface ProjectDetails {
+export type ProjectDetails = {
   name: string;
   client: string;
   color: string;
   colorLabel?: string;
   description?: string;
   hourlyRate?: string;
-}
+};
 
-export interface ProjectFormData {
+export type ProjectFormData = {
   projectId: string;
   client: string;
   projectName: string;
@@ -20,4 +20,27 @@ export interface ProjectFormData {
   description: string;
   hourlyRate: string;
   date: string;
+};
+
+export type AddProjectPayload = {
+  projectId: string;
+  date: string;
+};
+
+export type AddProjectResponse = {
+  success: boolean;
+  message: string;
+  projectId?: string;
+  date?: string;
+};
+
+export interface UpdateProjectCardPayload {
+  date: string;
+  totalSeconds: number;
+}
+
+export interface UpdateProjectCardResponse {
+  id: string;
+  date: string;
+  totalSeconds: number;
 }

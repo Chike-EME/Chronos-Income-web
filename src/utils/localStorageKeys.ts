@@ -1,5 +1,5 @@
 export const localStorageKeys = {
-  user: '@wisetipApostador: user',
-  accessToken: '@wisetipApostador: accessToken',
-  refreshToken: '@wisetipApostador: refreshToken',
+  user: '@chronosIncome: user',
+  accessToken: '@chronosIncome: accessToken',
+  //refreshToken: '@wisetipApostador: refreshToken',
 };

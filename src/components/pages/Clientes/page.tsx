@@ -22,10 +22,20 @@ import { ClientDetailsModal } from '@/components/Modals/ClientDetails';
 import { ClientDetails } from '@/components/types/clients/details';
 import { useClients } from '@/components/services/clients';
 import { ClientsSkeleton } from '@/components/skeletons/clients';
+import { CreateProjectModal } from '@/components/Modals/CreateProject';
+import { Modal } from '@/components/Modals';
+
+type ModalType =
+  | { type: 'none' }
+  | { type: 'success' }
+  | { type: 'deleteClient'; id: string }
+  | { type: 'error' };
 
 export default function Clientes() {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [createProjectOpen, setCreateProjectOpen] = useState(false);
+  const [modal, setModal] = useState<ModalType>({ type: 'none' });
   const [detailsModal, setDetailsModal] = useState<{
     open: boolean;
     client: ClientDetails | null;
@@ -49,6 +59,7 @@ export default function Clientes() {
 
   function handleDelete(id: string) {
     deleteClient.mutate(id);
+    setModal({ type: 'success' });
   }
 
   async function handleView(id: string) {
@@ -90,7 +101,12 @@ export default function Clientes() {
                     </ActionButton>
                     <ActionButton
                       $danger
-                      onClick={() => handleDelete(client.id)}
+                      onClick={() =>
+                        setModal({
+                          type: 'deleteClient',
+                          id: client.id,
+                        })
+                      }
                       aria-label="Excluir"
                     >
                       <img
@@ -136,8 +152,46 @@ export default function Clientes() {
         }
         client={detailsModal.client}
         loading={detailsModal.loading}
-        onAddProject={() =>
-          console.log('adicionar projeto ao cliente')
+        onAddProject={() => setCreateProjectOpen(true)}
+      />
+
+      <CreateProjectModal
+        isOpen={createProjectOpen}
+        clientId={detailsModal.client?.id ?? ''}
+        onClose={() => setCreateProjectOpen(false)}
+        onSuccess={() => {
+          setCreateProjectOpen(false);
+        }}
+      />
+
+      <Modal
+        isOpen={modal.type !== 'none'}
+        variant={modal.type === 'success' ? 'success' : 'danger'}
+        onClose={() => {
+          setModal({ type: 'none' });
+        }}
+        onConfirm={() => {
+          if (modal.type === 'deleteClient') {
+            handleDelete(modal.id);
+          } else {
+            setModal({ type: 'none' });
+          }
+        }}
+        customTitle={
+          modal.type == 'deleteClient'
+            ? 'Excluir cliente?'
+            : 'Sucesso!'
+        }
+        message={
+          modal.type === 'deleteClient'
+            ? 'Você está prestes a excluir um cliente.\n Tem certeza que deseja continuar?'
+            : 'Cliente excluido com sucesso.'
+        }
+        customClose={
+          modal.type === 'deleteClient' ? 'Cancelar' : 'none'
+        }
+        customConfirm={
+          modal.type === 'deleteClient' ? 'Excluir' : 'Fechar'
         }
       />
     </Wrapper>

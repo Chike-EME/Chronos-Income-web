@@ -12,7 +12,7 @@ export const Overlay = styled.div`
   justify-content: center;
 `;
 
-export const Modal = styled.div`
+export const ModalContainer = styled.div`
   width: 470px;
   max-height: 90vh;
 

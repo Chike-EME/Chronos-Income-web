@@ -1,4 +1,4 @@
-import { mockClients } from '@/components/mock/clients';
+import { mockClients } from '@/components/mock/clients/mock';
 import { Client } from '@/components/types/clients/details';
 import {
   useMutation,

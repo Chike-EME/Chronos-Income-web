@@ -12,6 +12,10 @@ import {
   WeekDay,
   Wrapper,
 } from './styles';
+import { AddProjectModal } from '@/components/Modals/AddProject';
+import { CalendarDay } from '@/components/types/calendar/calendar';
+import { useProjectCards } from '@/components/services/calendar/useProjectsCards';
+import { ProjectCard } from '@/components/Cards/Project';
 
 function getMonthDays(year: number, month: number): CalendarDay[] {
   const days: CalendarDay[] = [];
@@ -42,10 +46,31 @@ export default function Calendario() {
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const days = useMemo(() => {
     return getMonthDays(currentYear, currentMonth);
   }, [currentMonth, currentYear]);
+
+  function DayCards({ date }: { date: string }) {
+    const { cards, remove, update } = useProjectCards(date);
+    if (!cards.length) return null;
+
+    return (
+      <>
+        {cards.map(card => (
+          <ProjectCard
+            key={card.id}
+            card={card}
+            onDelete={id => remove.mutate(id)}
+            onUpdated={(id, date, totalSeconds) =>
+              update.mutate({ id, payload: { date, totalSeconds } })
+            }
+          />
+        ))}
+      </>
+    );
+  }
 
   useEffect(() => {
     if (todayRef.current) {
@@ -77,20 +102,19 @@ export default function Calendario() {
     setCurrentMonth(prev => prev - 1);
   }
 
-  const monthLabel = new Date(
-    currentYear,
-    currentMonth,
-  ).toLocaleDateString('pt-BR', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const monthLabel = new Date(currentYear, currentMonth).toLocaleDateString(
+    'pt-BR',
+    {
+      month: 'long',
+      year: 'numeric',
+    },
+  );
 
   useEffect(() => {
     if (!scrollRef.current) return;
 
     const isCurrentMonth =
-      currentMonth === today.getMonth() &&
-      currentYear === today.getFullYear();
+      currentMonth === today.getMonth() && currentYear === today.getFullYear();
 
     if (isCurrentMonth) return;
 
@@ -108,6 +132,7 @@ export default function Calendario() {
           buttonText={monthLabel}
           onNextMonth={onNextMonth}
           onPrevMonth={onPrevMonth}
+          onAddClick={() => setIsAddModalOpen(true)}
         />
       </HeaderWrapper>
 
@@ -123,16 +148,21 @@ export default function Calendario() {
                 $today={isToday}
               >
                 <DayNumber>{item.day}</DayNumber>
-
-                <WeekDay>
-                  {item.weekDay.charAt(0).toUpperCase() +
-                    item.weekDay.slice(1)}
+                <WeekDay style={{ marginBottom: '20px' }}>
+                  {item.weekDay.charAt(0).toUpperCase() + item.weekDay.slice(1)}
                 </WeekDay>
+                <DayCards date={item.fullDate} />
               </DayColumn>
             );
           })}
         </CalendarContainer>
       </ScrollArea>
+
+      <AddProjectModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={() => setIsAddModalOpen(false)}
+      />
     </Wrapper>
   );
 }

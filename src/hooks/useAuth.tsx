@@ -1,5 +1,3 @@
-/* eslint-disable react/jsx-no-constructed-context-values */
-
 'use client';
 
 import { localStorageKeys } from '@/utils/localStorageKeys';
@@ -14,9 +12,8 @@ import {
 } from 'react';
 
 export interface User {
-  id: number;
-  email: string;
   username: string;
+  email: string;
 }
 
 interface IUserProvider {
@@ -32,6 +29,8 @@ interface ChildrenProps {
 
 const AuthContext = createContext({} as IUserProvider);
 
+const publicRoutes = ['/', '/esqueci-senha', '/redefinir-senha'];
+
 const AuthProvider = ({ children }: ChildrenProps) => {
   const [user, setUser] = useState<User>({} as User);
   const [loading, setLoading] = useState(true);
@@ -40,43 +39,37 @@ const AuthProvider = ({ children }: ChildrenProps) => {
 
   useEffect(() => {
     const dataUser = localStorage.getItem(localStorageKeys.user);
+    const token = localStorage.getItem(localStorageKeys.accessToken);
 
-    if (dataUser) {
+    if (dataUser && token) {
       setUser(JSON.parse(dataUser));
     }
 
     setLoading(false);
   }, []);
 
-  const isAuthenticated = !!user.id;
+  // critério: token presente + email populado
+  const isAuthenticated = !!user.email;
 
   const logout = () => {
     localStorage.removeItem(localStorageKeys.user);
     localStorage.removeItem(localStorageKeys.accessToken);
-    localStorage.removeItem(localStorageKeys.refreshToken);
     setUser({} as User);
+    router.push('/');
   };
 
-  const publicRoutes = ['/', '/esqueci-senha', '/redefinir-senha'];
-
   useEffect(() => {
-    if (
-      !loading &&
-      !isAuthenticated &&
-      !publicRoutes.includes(pathname)
-    ) {
+    // if (!loading && !isAuthenticated && !publicRoutes.includes(pathname)) {
+    if (false) {
+      // enquanto o back não funciona
       router.push('/');
     }
   }, [loading, isAuthenticated, pathname]);
 
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
 
   return (
-    <AuthContext.Provider
-      value={{ user, setUser, isAuthenticated, logout }}
-    >
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated, logout }}>
       {children}
     </AuthContext.Provider>
   );

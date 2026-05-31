@@ -80,7 +80,7 @@ export function Modal({
         </IconWrapper>
         <h2>{title}</h2>
 
-        <h3>{message && <p>{message}</p>}</h3>
+        <h3 style={{ whiteSpace: 'pre-line' }}>{message}</h3>
 
         <ButtonGroup>
           {customClose === 'none' ? (
@@ -119,3 +119,16 @@ export function Modal({
     </Overlay>
   );
 }
+
+/*
+  <Modal
+    isOpen={modal.type !== 'none'}
+    variant=""
+    onClose={() => {}}
+    onConfirm={() => {}}
+    customTitle=""
+    message=""
+    customClose=""
+    customConfirm=""
+  />
+*/

@@ -3,13 +3,11 @@
 import { PropsWithChildren } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { ThemeProvider } from 'styled-components';
-import 'react-toastify/dist/ReactToastify.css';
 
 import StyledComponentsRegistry from '@/libs/registry';
 import { GlobalStyle } from '@/styles/global';
 import { theme } from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import handleError from '@/utils/handleToast';
 import AuthProvider from '@/hooks/useAuth';
 
 const queryClient = new QueryClient({
@@ -19,7 +17,9 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
     mutations: {
-      onError: handleError,
+      onError: () => {
+        console.log('error');
+      },
     },
   },
 });

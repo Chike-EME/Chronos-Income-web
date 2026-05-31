@@ -1,4 +1,3 @@
-// components/Modal/AddClientModal/index.tsx
 import { useState } from 'react';
 import {
   Overlay,
@@ -58,12 +57,7 @@ export function AddClientModal({
         <Header>
           <Title>Adicionar cliente</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
-            <img
-              src="/img/CloseIcon.svg"
-              alt="fechar"
-              width={24}
-              height={24}
-            />
+            <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
         </Header>
 
@@ -90,9 +84,7 @@ export function AddClientModal({
             <Label>Descrição (opcional)</Label>
             <Input
               value={form.description}
-              onChange={e =>
-                handleChange('description', e.target.value)
-              }
+              onChange={e => handleChange('description', e.target.value)}
               placeholder="Insira uma descrição"
             />
           </Field>

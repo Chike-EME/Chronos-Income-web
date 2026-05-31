@@ -58,7 +58,7 @@ interface DayColumnProps {
 }
 
 export const DayColumn = styled.div<DayColumnProps>`
-  width: 170px;
+  width: 200px;
   min-height: calc(100vh - 220px);
 
   background: ${({ theme }) => theme.colors.primary[20] ?? '#dce8db'};

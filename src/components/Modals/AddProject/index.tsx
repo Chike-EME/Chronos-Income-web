@@ -1,90 +1,109 @@
+import {
+  useProjectDetails,
+  useProjectOptions,
+} from '@/components/services/calendar/useProjects';
+import { ProjectFormData } from '@/components/types/calendar/addProject';
 import { useState } from 'react';
 import {
-  Overlay,
-  Modal,
-  Header,
-  Title,
+  ChevronIcon,
   CloseButton,
-  ScrollArea,
+  ColorRow,
+  ColorSwatch,
+  DisplayField,
   Field,
+  Header,
+  Input,
   Label,
+  LoadingShimmer,
+  ModalContainer,
+  Overlay,
+  ScrollArea,
   Select,
   SelectWrapper,
-  ChevronIcon,
-  Input,
-  DisplayField,
-  ColorSwatch,
-  ColorRow,
   SubmitButton,
-  LoadingShimmer,
+  Title,
 } from './styles';
-import {
-  ProjectFormData,
-  ProjectDetails,
-  ProjectSelectOption,
-} from '@/components/types/calendar/addProject';
+import { addProject } from '@/components/services/calendar/service';
+import { Modal } from '..';
 
 interface AddProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: ProjectFormData) => void;
-  projectOptions?: ProjectSelectOption[];
-  fetchProjectDetails: (id: string) => Promise<ProjectDetails>;
 }
+
+type ModalType =
+  | { type: 'none' }
+  | { type: 'success' }
+  | { type: 'error' };
 
 export function AddProjectModal({
   isOpen,
   onClose,
   onSubmit,
-  projectOptions = [],
-  fetchProjectDetails,
 }: AddProjectModalProps) {
   const [selectedId, setSelectedId] = useState('');
-  const [details, setDetails] = useState<ProjectDetails | null>(null);
-  const [loading, setLoading] = useState(false);
-
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
+  const [modal, setModal] = useState<ModalType>({ type: 'none' });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
+
+  const { data: projectOptions = [], isLoading: optionsLoading } =
+    useProjectOptions();
+  const { data: details, isFetching: detailsLoading } =
+    useProjectDetails(selectedId);
 
   if (!isOpen) return null;
 
-  async function handleProjectChange(id: string) {
+  const ready = !!details && !detailsLoading;
+
+  function handleProjectChange(id: string) {
     setSelectedId(id);
-    setDetails(null);
-
-    if (!id) return;
-
-    setLoading(true);
-    try {
-      const data = await fetchProjectDetails(id);
-      setDetails(data);
-    } finally {
-      setLoading(false);
-    }
   }
 
-  function handleSubmit() {
-    if (!details) return;
-    onSubmit({
-      projectId: selectedId,
-      client: details.client,
-      projectName: details.name,
-      color: details.color,
-      description: details.description ?? '',
-      hourlyRate: details.hourlyRate ?? '',
-      date,
-    });
+  async function handleSubmit() {
+    if (!details || !selectedId || !date) return;
+
+    setSubmitting(true);
+    setFeedback(null);
+
+    try {
+      const response = await addProject({
+        projectId: selectedId,
+        date,
+      });
+      setFeedback({
+        success: response.success,
+        message: response.message,
+      });
+
+      if (response.success) {
+        setModal({ type: 'success' });
+        setTimeout(() => {
+          setFeedback(null);
+          setSelectedId('');
+          setDate(today);
+        }, 1200);
+      } else {
+        setModal({ type: 'error' });
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
     if (e.target === e.currentTarget) onClose();
   }
 
-  const ready = !!details && !loading;
-
   return (
     <Overlay onClick={handleOverlayClick}>
-      <Modal>
+      <ModalContainer>
         <Header>
           <Title>Adicionar projeto</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
@@ -100,23 +119,21 @@ export function AddProjectModal({
         <ScrollArea>
           <Field>
             <Label>Projeto</Label>
-
             <SelectWrapper>
               <Select
                 value={selectedId}
                 onChange={e => handleProjectChange(e.target.value)}
+                disabled={optionsLoading}
               >
                 <option value="" disabled>
-                  Selecione
+                  {optionsLoading ? 'Carregando...' : 'Selecione'}
                 </option>
-
                 {projectOptions.map(p => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
                 ))}
               </Select>
-
               <ChevronIcon>
                 <img
                   src="/img/ChevronDown.svg"
@@ -130,7 +147,6 @@ export function AddProjectModal({
 
           <Field>
             <Label>Data</Label>
-
             <Input
               type="date"
               value={date}
@@ -141,8 +157,7 @@ export function AddProjectModal({
 
           <Field>
             <Label>Cliente</Label>
-
-            {loading ? (
+            {detailsLoading ? (
               <LoadingShimmer />
             ) : (
               <DisplayField $empty={!details}>
@@ -153,8 +168,7 @@ export function AddProjectModal({
 
           <Field>
             <Label>Valor hora</Label>
-
-            {loading ? (
+            {detailsLoading ? (
               <LoadingShimmer />
             ) : (
               <DisplayField $empty={!details?.hourlyRate}>
@@ -167,8 +181,7 @@ export function AddProjectModal({
 
           <Field>
             <Label>Cor</Label>
-
-            {loading ? (
+            {detailsLoading ? (
               <LoadingShimmer />
             ) : (
               <DisplayField $empty={!details}>
@@ -186,8 +199,7 @@ export function AddProjectModal({
 
           <Field>
             <Label>Descrição</Label>
-
-            {loading ? (
+            {detailsLoading ? (
               <LoadingShimmer />
             ) : (
               <DisplayField $empty={!details?.description}>
@@ -203,7 +215,34 @@ export function AddProjectModal({
         >
           Concluir
         </SubmitButton>
-      </Modal>
+      </ModalContainer>
+      <Modal
+        isOpen={modal.type !== 'none'}
+        variant={modal.type === 'success' ? 'success' : 'danger'}
+        onClose={() => {
+          setModal({ type: 'none' });
+          if (modal.type === 'success') {
+          }
+        }}
+        onConfirm={() => {
+          if (modal.type === 'error') {
+            setModal({ type: 'none' });
+          } else {
+            setModal({ type: 'none' });
+            onClose();
+          }
+        }}
+        customTitle={
+          modal.type === 'success' ? 'Projeto vinculado!' : 'Erro'
+        }
+        message={
+          modal.type === 'success'
+            ? 'Projeto vinculado ao dia selecionado com sucesso.'
+            : 'Erro ao vincular projeto, por favor tente novamente.'
+        }
+        customClose="none"
+        customConfirm={modal.type === 'success' ? 'Fechar' : 'Voltar'}
+      />
     </Overlay>
   );
 }
