@@ -59,8 +59,7 @@ export const CloseButton = styled.button`
   transition: background 0.15s ease;
 
   &:hover {
-    background: ${({ theme }) =>
-      theme.colors.primary[20] ?? '#f0f0f0'};
+    background: ${({ theme }) => theme.colors.primary[20] ?? '#f0f0f0'};
   }
 `;
 
@@ -76,16 +75,14 @@ export const ScrollArea = styled.div`
   gap: 16px;
 
   scrollbar-width: thin;
-  scrollbar-color: ${({ theme }) => theme.colors.primary[80]}
-    transparent;
+  scrollbar-color: ${({ theme }) => theme.colors.primary[80]} transparent;
 
   &::-webkit-scrollbar {
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: ${({ theme }) =>
-      theme.colors.primary[20] ?? '#e0ede0'};
+    background: ${({ theme }) => theme.colors.primary[20] ?? '#e0ede0'};
     border-radius: 99px;
   }
 

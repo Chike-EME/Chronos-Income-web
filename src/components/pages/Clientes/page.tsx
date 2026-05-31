@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { AddClientModal } from '@/components/Modals/AddClient';
-import { ClientFormData } from '@/components/Modals/AddClient';
+
 import {
   Wrapper,
   ScrollArea,
@@ -17,18 +17,19 @@ import {
   MetaItem,
   Description,
 } from './styles';
-import { fetchClientDetails } from '@/components/services/clients/details/service';
+import { useClients } from '@/components/services/clients/useClients';
 import { ClientDetailsModal } from '@/components/Modals/ClientDetails';
-import { ClientDetails } from '@/components/types/clients/details';
-import { useClients } from '@/components/services/clients';
+import { ClientDetails } from '@/components/types/clients/types';
 import { ClientsSkeleton } from '@/components/skeletons/clients';
 import { CreateProjectModal } from '@/components/Modals/CreateProject';
 import { Modal } from '@/components/Modals';
+import { fetchClientDetails } from '@/components/services/clients/service';
 
 type ModalType =
   | { type: 'none' }
   | { type: 'success' }
   | { type: 'deleteClient'; id: string }
+  | { type: 'deleteError' }
   | { type: 'error' };
 
 export default function Clientes() {
@@ -42,31 +43,72 @@ export default function Clientes() {
     loading: boolean;
   }>({ open: false, client: null, loading: false });
 
-  const { clients, isLoading, addClient, deleteClient } =
-    useClients(search);
+  const { clients, isLoading, deleteClient } = useClients(search, {
+    onDeleteSuccess: deletedId => {
+      if (detailsModal.client?.id === deletedId) {
+        setDetailsModal({ open: false, client: null, loading: false });
+      }
+      setModal({ type: 'success' });
+    },
+    onDeleteError: error => {
+      const msg = error.message.toLowerCase();
+      const hasProjects =
+        msg.includes('projeto') ||
+        msg.includes('project') ||
+        msg.includes('vinculado') ||
+        msg.includes('associated');
 
-  function handleAddClient(data: ClientFormData) {
-    addClient.mutate(
-      {
-        name: data.name,
-        cnpj: data.cnpj,
-        projectCount: 0,
-        description: data.description || undefined,
-      },
-      { onSuccess: () => setIsModalOpen(false) },
-    );
-  }
+      setModal({ type: hasProjects ? 'deleteError' : 'error' });
+    },
+  });
 
   function handleDelete(id: string) {
     deleteClient.mutate(id);
-    setModal({ type: 'success' });
   }
 
   async function handleView(id: string) {
+    const clientOnList = clients.find(c => c.id === id);
+
     setDetailsModal({ open: true, client: null, loading: true });
-    const data = await fetchClientDetails(id);
-    setDetailsModal({ open: true, client: data, loading: false });
+
+    try {
+      const data = await fetchClientDetails(id, {
+        name: clientOnList?.name ?? '',
+        cnpj: clientOnList?.cnpj ?? '',
+        description: clientOnList?.description,
+      });
+      setDetailsModal({ open: true, client: data, loading: false });
+    } catch {
+      setDetailsModal({ open: false, client: null, loading: false });
+      setModal({ type: 'error' });
+    }
   }
+
+  const modalTitle = () => {
+    switch (modal.type) {
+      case 'deleteClient':
+        return 'Excluir cliente?';
+      case 'deleteError':
+        return 'Não é possível excluir';
+      case 'success':
+        return 'Sucesso!';
+      default:
+        return 'Erro';
+    }
+  };
+
+  const modalMessage = () => {
+    switch (modal.type) {
+      case 'deleteClient':
+        return 'Você está prestes a excluir um cliente.\nTem certeza que deseja continuar?';
+      case 'deleteError':
+        return 'Este cliente possui projetos vinculados. Remova os projetos antes de excluir o cliente.';
+      case 'success':
+        return 'Cliente excluído com sucesso.';
+      default:
+        return 'Ocorreu um erro inesperado. Tente novamente.';
+    }
+  };
 
   return (
     <Wrapper>
@@ -125,9 +167,7 @@ export default function Clientes() {
                 </CardMeta>
 
                 {client.description && (
-                  <Description>
-                    Descrição: {client.description}
-                  </Description>
+                  <Description>Descrição: {client.description}</Description>
                 )}
               </ClientCard>
             ))}
@@ -138,7 +178,7 @@ export default function Clientes() {
       <AddClientModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddClient}
+        onSuccess={() => setIsModalOpen(false)}
       />
 
       <ClientDetailsModal
@@ -167,32 +207,18 @@ export default function Clientes() {
       <Modal
         isOpen={modal.type !== 'none'}
         variant={modal.type === 'success' ? 'success' : 'danger'}
-        onClose={() => {
-          setModal({ type: 'none' });
-        }}
+        onClose={() => setModal({ type: 'none' })}
         onConfirm={() => {
           if (modal.type === 'deleteClient') {
-            handleDelete(modal.id);
+            handleDelete((modal as { type: 'deleteClient'; id: string }).id);
           } else {
             setModal({ type: 'none' });
           }
         }}
-        customTitle={
-          modal.type == 'deleteClient'
-            ? 'Excluir cliente?'
-            : 'Sucesso!'
-        }
-        message={
-          modal.type === 'deleteClient'
-            ? 'Você está prestes a excluir um cliente.\n Tem certeza que deseja continuar?'
-            : 'Cliente excluido com sucesso.'
-        }
-        customClose={
-          modal.type === 'deleteClient' ? 'Cancelar' : 'none'
-        }
-        customConfirm={
-          modal.type === 'deleteClient' ? 'Excluir' : 'Fechar'
-        }
+        customTitle={modalTitle()}
+        message={modalMessage()}
+        customClose={modal.type === 'deleteClient' ? 'Cancelar' : 'none'}
+        customConfirm={modal.type === 'deleteClient' ? 'Excluir' : 'Fechar'}
       />
     </Wrapper>
   );

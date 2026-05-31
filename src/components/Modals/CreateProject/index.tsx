@@ -9,12 +9,14 @@ import {
   Field,
   Label,
   Input,
-  Select,
   SelectWrapper,
+  Select,
   ChevronIcon,
   SubmitButton,
 } from './styles';
-import { addClientProject } from '@/components/services/clients/createProject/service';
+import { Modal as ConfirmModal } from '@/components/Modals';
+import { useCreateProject } from '@/components/services/clients/useCreateProject';
+import { ErrorText } from '@/styles/global';
 
 const colorOptions = [
   { label: 'Azul', value: '#4A90D9' },
@@ -25,52 +27,57 @@ const colorOptions = [
   { label: 'Roxo', value: '#7C3AED' },
 ];
 
-export interface AddClientProjectFormData {
-  clientId: string;
-  name: string;
-  color: string;
-  description: string;
-  hourlyRate: string;
-  date: string;
-}
-
-interface AddClientProjectModalProps {
+interface CreateProjectModalProps {
   isOpen: boolean;
   clientId: string;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
+type ModalType = { type: 'none' } | { type: 'success' } | { type: 'error' };
+
 export function CreateProjectModal({
   isOpen,
   clientId,
   onClose,
   onSuccess,
-}: AddClientProjectModalProps) {
+}: CreateProjectModalProps) {
   const [form, setForm] = useState({
     name: '',
     color: '',
-    description: '',
     hourlyRate: '',
-    date: '',
+    description: '',
+    startDate: '',
   });
-  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [modal, setModal] = useState<ModalType>({ type: 'none' });
+
+  const { mutate: submitProject, isPending } = useCreateProject({
+    onSuccess: () => {
+      setModal({ type: 'success' });
+    },
+    onError: message => {
+      setErrorMessage(message);
+    },
+  });
 
   if (!isOpen) return null;
 
   function handleChange(field: keyof typeof form, value: string) {
     setForm(prev => ({ ...prev, [field]: value }));
+    if (errorMessage) setErrorMessage('');
   }
 
-  async function handleSubmit() {
-    setLoading(true);
-    try {
-      await addClientProject({ clientId, ...form });
-      onSuccess?.();
-      onClose();
-    } finally {
-      setLoading(false);
-    }
+  function handleSubmit() {
+    if (!clientId) return;
+    submitProject({
+      name: form.name,
+      color: form.color,
+      hourlyRate: Number(form.hourlyRate),
+      description: form.description,
+      startDate: form.startDate,
+      clientId,
+    });
   }
 
   function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
@@ -80,7 +87,7 @@ export function CreateProjectModal({
   const isValid =
     form.name.trim() !== '' &&
     form.color !== '' &&
-    form.date.trim() !== '';
+    form.startDate.trim() !== '';
 
   return (
     <Overlay onClick={handleOverlayClick}>
@@ -88,12 +95,7 @@ export function CreateProjectModal({
         <Header>
           <Title>Adicionar projeto</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
-            <img
-              src="/img/CloseIcon.svg"
-              alt="fechar"
-              width={24}
-              height={24}
-            />
+            <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
         </Header>
 
@@ -124,12 +126,7 @@ export function CreateProjectModal({
                 ))}
               </Select>
               <ChevronIcon>
-                <img
-                  src="/img/ChevronDown.svg"
-                  alt=""
-                  width={16}
-                  height={16}
-                />
+                <img src="/img/ChevronDown.svg" alt="" width={16} height={16} />
               </ChevronIcon>
             </SelectWrapper>
           </Field>
@@ -138,9 +135,7 @@ export function CreateProjectModal({
             <Label>Descrição (opcional)</Label>
             <Input
               value={form.description}
-              onChange={e =>
-                handleChange('description', e.target.value)
-              }
+              onChange={e => handleChange('description', e.target.value)}
               placeholder="Insira uma descrição"
             />
           </Field>
@@ -149,9 +144,7 @@ export function CreateProjectModal({
             <Label>Valor hora (opcional)</Label>
             <Input
               value={form.hourlyRate}
-              onChange={e =>
-                handleChange('hourlyRate', e.target.value)
-              }
+              onChange={e => handleChange('hourlyRate', e.target.value)}
               placeholder="Insira o valor hora"
               type="number"
               min={0}
@@ -159,22 +152,40 @@ export function CreateProjectModal({
           </Field>
 
           <Field>
-            <Label>Data</Label>
+            <Label>Data de início</Label>
             <Input
-              value={form.date}
-              onChange={e => handleChange('date', e.target.value)}
-              placeholder="DD/MM/AAAA"
+              type="date"
+              value={form.startDate}
+              onChange={e => handleChange('startDate', e.target.value)}
             />
           </Field>
+
+          {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
         </ScrollArea>
 
-        <SubmitButton
-          onClick={handleSubmit}
-          disabled={!isValid || loading}
-        >
-          {loading ? 'Salvando...' : 'Concluir'}
+        <SubmitButton onClick={handleSubmit} disabled={!isValid || isPending}>
+          {isPending ? 'Salvando...' : 'Concluir'}
         </SubmitButton>
       </Modal>
+
+      <ConfirmModal
+        isOpen={modal.type !== 'none'}
+        variant="success"
+        onClose={() => {
+          setModal({ type: 'none' });
+          onClose();
+          onSuccess?.();
+        }}
+        onConfirm={() => {
+          setModal({ type: 'none' });
+          onClose();
+          onSuccess?.();
+        }}
+        customTitle="Projeto criado!"
+        message="Projeto criado com sucesso."
+        customClose="none"
+        customConfirm="Fechar"
+      />
     </Overlay>
   );
 }

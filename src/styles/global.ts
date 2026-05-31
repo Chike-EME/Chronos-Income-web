@@ -170,6 +170,16 @@ export const ErrorMessage = styled.span`
   color: ${({ theme }) => theme.colors.error};
 `;
 
+export const ErrorText = styled.p`
+  margin: 0;
+  font-size: 13px;
+  font-family: var(--font-lato);
+  color: ${({ theme }) => theme.colors.error};
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fde8e8;
+`;
+
 export const Checkbox = styled.input.attrs({ type: 'checkbox' })`
   appearance: none;
   -webkit-appearance: none;
@@ -248,15 +258,13 @@ export const ClientInfo = styled.div`
   gap: 10px;
 
   scrollbar-width: thin;
-  scrollbar-color: ${({ theme }) => theme.colors.primary[80]}
-    transparent;
+  scrollbar-color: ${({ theme }) => theme.colors.primary[80]} transparent;
 
   &::-webkit-scrollbar {
     width: 4px;
   }
   &::-webkit-scrollbar-track {
-    background: ${({ theme }) =>
-      theme.colors.primary[40] ?? '#c5dcc4'};
+    background: ${({ theme }) => theme.colors.primary[40] ?? '#c5dcc4'};
     border-radius: 99px;
   }
   &::-webkit-scrollbar-thumb {

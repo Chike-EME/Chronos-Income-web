@@ -1,4 +1,4 @@
-import { ClientDetails } from '@/components/types/clients/details';
+import { ClientDetails } from '@/components/types/clients/types';
 import {
   Overlay,
   Modal,
@@ -44,12 +44,7 @@ export function ClientDetailsModal({
         <Header>
           <Title>Detalhes do cliente</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
-            <img
-              src="/img/CloseIcon.svg"
-              alt="fechar"
-              width={24}
-              height={24}
-            />
+            <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
         </Header>
 
@@ -74,9 +69,7 @@ export function ClientDetailsModal({
               {client.projects.map(project => (
                 <ProjectCard key={project.id} $color={project.color}>
                   <ProjectName>{project.name}</ProjectName>
-                  <ProjectDescription>
-                    {project.description}
-                  </ProjectDescription>
+                  <ProjectDescription>{project.description}</ProjectDescription>
                   <ProjectMeta>Cliente: {project.client}</ProjectMeta>
                   <ProjectMeta>
                     <strong>Total de horas:</strong>
