@@ -75,6 +75,8 @@ export async function fetchProjectCardsByDate(
       clientName: e.clientName,
       clientId: String(e.clientId),
       date: e.entryDate,
+      startTime: e.startTime,
+      endTime: e.endTime ?? '',
       totalSeconds: durationToSeconds(e.duration),
       isRunning: e.timerStatus === 'RUNNING',
       status: e.timerStatus,
@@ -88,7 +90,7 @@ export async function updateProjectCard(
 ): Promise<UpdateProjectCardResponse> {
   await new Promise(res => setTimeout(res, 400));
   console.log('[mock] updateProjectCard →', { id, payload });
-  return { id, ...payload };
+  return { id, ...payload, duration: '' };
 }
 
 export async function pauseTimer(cardId: string): Promise<TimeEntryAPI> {
