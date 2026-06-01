@@ -1,8 +1,10 @@
 import { api } from '@/components/services/api/request';
 import {
+  CreateInvoicePayload,
+  CreateInvoiceResponse,
   FetchInvoicesResponse,
-  GenerateInvoicePayload,
   Invoice,
+  InvoiceStatus,
 } from '@/components/types/invoices/types';
 
 export async function fetchInvoices(): Promise<FetchInvoicesResponse> {
@@ -19,8 +21,21 @@ export async function downloadInvoice(id: string): Promise<void> {
   console.log('[invoices] downloadInvoice →', id);
 }
 
-export async function generateInvoice(
-  payload: GenerateInvoicePayload,
+export async function createInvoice(
+  payload: CreateInvoicePayload,
+): Promise<CreateInvoiceResponse> {
+  return api<CreateInvoiceResponse>('/invoices', {
+    method: 'POST',
+    body: payload,
+  });
+}
+
+export async function updateInvoiceStatus(
+  id: string,
+  status: InvoiceStatus,
 ): Promise<void> {
-  await api('/invoices', { method: 'POST', body: payload });
+  await api(`/invoices/${id}/status`, {
+    method: 'PATCH',
+    body: { status },
+  });
 }

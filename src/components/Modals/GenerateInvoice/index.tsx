@@ -1,3 +1,4 @@
+// components/Modals/GenerateInvoice/index.tsx
 import { useState } from 'react';
 import {
   Overlay,
@@ -18,19 +19,9 @@ import {
   SubmitButton,
 } from './styles';
 import { Modal as ConfirmModal } from '@/components/Modals';
-import { generateInvoice } from '@/components/services/invoices/service';
-
-const mockClients = [
-  { id: '1', name: 'Ágatha Jamille' },
-  { id: '2', name: 'Carla Franco' },
-  { id: '3', name: 'Guilherme Mendes' },
-];
-
-const mockProjects = [
-  { id: '1', name: 'Projeto 1' },
-  { id: '2', name: 'Projeto 2' },
-  { id: '3', name: 'Projeto 3' },
-];
+import { useProjectOptions } from '@/components/services/calendar/projects/useProjects';
+import { createInvoice } from '@/components/services/invoices/service';
+import { ErrorText } from '@/styles/global';
 
 interface GenerateInvoiceModalProps {
   isOpen: boolean;
@@ -44,25 +35,40 @@ export function GenerateInvoiceModal({
   onSuccess,
 }: GenerateInvoiceModalProps) {
   const [form, setForm] = useState({
-    dateFrom: '',
-    dateTo: '',
-    clientId: '',
     projectId: '',
+    hourlyRate: '',
+    periodStart: '',
+    periodEnd: '',
   });
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const { data: projectOptions = [], isLoading: projectsLoading } =
+    useProjectOptions();
 
   if (!isOpen) return null;
 
   function handleChange(field: keyof typeof form, value: string) {
     setForm(prev => ({ ...prev, [field]: value }));
+    if (errorMessage) setErrorMessage('');
   }
 
   async function handleSubmit() {
     setLoading(true);
+    setErrorMessage('');
     try {
-      await generateInvoice(form);
+      await createInvoice({
+        projectId: Number(form.projectId),
+        hourlyRate: Number(form.hourlyRate),
+        periodStart: form.periodStart,
+        periodEnd: form.periodEnd,
+      });
       setSuccessOpen(true);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Erro ao gerar invoice.',
+      );
     } finally {
       setLoading(false);
     }
@@ -70,7 +76,7 @@ export function GenerateInvoiceModal({
 
   function handleSuccessConfirm() {
     setSuccessOpen(false);
-    setForm({ dateFrom: '', dateTo: '', clientId: '', projectId: '' });
+    setForm({ projectId: '', hourlyRate: '', periodStart: '', periodEnd: '' });
     onClose();
     onSuccess?.();
   }
@@ -79,7 +85,10 @@ export function GenerateInvoiceModal({
     if (e.target === e.currentTarget) onClose();
   }
 
-  const isValid = form.dateFrom.trim() !== '' && form.dateTo.trim() !== '';
+  const isValid =
+    form.projectId !== '' &&
+    form.periodStart.trim() !== '' &&
+    form.periodEnd.trim() !== '';
 
   return (
     <Overlay onClick={handleOverlayClick}>
@@ -98,40 +107,20 @@ export function GenerateInvoiceModal({
               <PeriodField>
                 <Label>De</Label>
                 <Input
-                  value={form.dateFrom}
-                  onChange={e => handleChange('dateFrom', e.target.value)}
-                  placeholder="DD/MM/AAAA"
+                  type="date"
+                  value={form.periodStart}
+                  onChange={e => handleChange('periodStart', e.target.value)}
                 />
               </PeriodField>
               <PeriodField>
                 <Label>Até</Label>
                 <Input
-                  value={form.dateTo}
-                  onChange={e => handleChange('dateTo', e.target.value)}
-                  placeholder="DD/MM/AAAA"
+                  type="date"
+                  value={form.periodEnd}
+                  onChange={e => handleChange('periodEnd', e.target.value)}
                 />
               </PeriodField>
             </PeriodRow>
-          </Field>
-
-          <Field>
-            <Label>Cliente</Label>
-            <SelectWrapper>
-              <Select
-                value={form.clientId}
-                onChange={e => handleChange('clientId', e.target.value)}
-              >
-                <option value="">Selecione</option>
-                {mockClients.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </Select>
-              <ChevronIcon>
-                <img src="/img/ChevronDown.svg" alt="" width={16} height={16} />
-              </ChevronIcon>
-            </SelectWrapper>
           </Field>
 
           <Field>
@@ -140,9 +129,12 @@ export function GenerateInvoiceModal({
               <Select
                 value={form.projectId}
                 onChange={e => handleChange('projectId', e.target.value)}
+                disabled={projectsLoading}
               >
-                <option value="">Selecione</option>
-                {mockProjects.map(p => (
+                <option value="">
+                  {projectsLoading ? 'Carregando...' : 'Selecione'}
+                </option>
+                {projectOptions.map(p => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
@@ -153,6 +145,19 @@ export function GenerateInvoiceModal({
               </ChevronIcon>
             </SelectWrapper>
           </Field>
+
+          <Field>
+            <Label>Valor hora (opcional)</Label>
+            <Input
+              type="number"
+              min={0}
+              value={form.hourlyRate}
+              onChange={e => handleChange('hourlyRate', e.target.value)}
+              placeholder="Ex: 150.00"
+            />
+          </Field>
+
+          {errorMessage && <ErrorText>{errorMessage}</ErrorText>}
         </Body>
 
         <Footer>

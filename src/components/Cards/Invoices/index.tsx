@@ -1,26 +1,24 @@
-import { Invoice } from '@/components/types/invoices/types';
+// components/Cards/Invoices/index.tsx — remover CardBadge, usar InvoiceStatusBadge
+import { useState } from 'react';
+import { Invoice, InvoiceStatus } from '@/components/types/invoices/types';
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardBadge,
   CardProject,
   CardMeta,
   CardMetaItem,
   CardActions,
   ActionButton,
 } from './styles';
-
-const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  PENDING: { label: 'Pendente', color: '#E8900A' },
-  PAID: { label: 'Pago', color: '#4CAF50' },
-  CANCELLED: { label: 'Cancelado', color: '#E84545' },
-};
+import { updateInvoiceStatus } from '@/components/services/invoices/service';
+import { InvoiceStatusBadge } from './statusBadge';
 
 interface InvoiceCardProps {
   invoice: Invoice;
   onDownload: (id: string) => void;
   onDelete: (id: string) => void;
+  onStatusChanged?: (id: string, status: InvoiceStatus) => void;
   downloading?: boolean;
 }
 
@@ -28,8 +26,25 @@ export function InvoiceCard({
   invoice,
   onDownload,
   onDelete,
+  onStatusChanged,
   downloading,
 }: InvoiceCardProps) {
+  const [status, setStatus] = useState(invoice.status);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  async function handleStatusChange(newStatus: InvoiceStatus) {
+    setUpdatingStatus(true);
+    try {
+      await updateInvoiceStatus(invoice.id, newStatus);
+      setStatus(newStatus);
+      onStatusChanged?.(invoice.id, newStatus);
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  }
+
   const totalFormatted = invoice.totalAmount.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -38,16 +53,12 @@ export function InvoiceCard({
   const period = `${formatDate(invoice.periodStart)} – ${formatDate(
     invoice.periodEnd,
   )}`;
-  const status = STATUS_CONFIG[invoice.status] ?? {
-    label: invoice.status,
-    color: '#aaa',
-  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>{invoice.invoiceNumber}</CardTitle>
-        <CardBadge $color={status.color}>{status.label}</CardBadge>
+        <InvoiceStatusBadge status={status} onChange={handleStatusChange} />
       </CardHeader>
 
       <CardProject>{invoice.projectName}</CardProject>
@@ -74,7 +85,7 @@ export function InvoiceCard({
         <ActionButton
           onClick={() => onDownload(invoice.id)}
           aria-label="Baixar invoice"
-          disabled={downloading}
+          disabled={downloading || updatingStatus}
         >
           <img
             src="/img/DownloadIcon.svg"
@@ -87,6 +98,7 @@ export function InvoiceCard({
           $danger
           onClick={() => onDelete(invoice.id)}
           aria-label="Excluir invoice"
+          disabled={updatingStatus}
         >
           <img src="/img/TrashIcon.svg" alt="excluir" width={20} height={20} />
         </ActionButton>
