@@ -5,6 +5,7 @@ import {
   ReportFilter,
 } from '@/components/types/reports/types';
 import { api } from '../api/request';
+import { toLocalDateString } from '@/utils/date';
 
 const CLIENT_COLORS = [
   '#2E86DE',
@@ -34,8 +35,8 @@ function getDateRange(date: Date, filter?: Partial<ReportFilter>) {
   // padrão: primeiro e último dia do mês atual
   const year = date.getFullYear();
   const month = date.getMonth();
-  const start = new Date(year, month, 1).toISOString().split('T')[0];
-  const end = new Date(year, month + 1, 0).toISOString().split('T')[0];
+  const start = toLocalDateString(new Date(year, month, 1));
+  const end = toLocalDateString(new Date(year, month + 1, 0));
   return { start, end };
 }
 

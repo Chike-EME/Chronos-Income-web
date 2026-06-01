@@ -1,4 +1,3 @@
-// components/Modals/GenerateInvoice/index.tsx
 import { useState } from 'react';
 import {
   Overlay,
@@ -22,6 +21,7 @@ import { Modal as ConfirmModal } from '@/components/Modals';
 import { useProjectOptions } from '@/components/services/calendar/projects/useProjects';
 import { createInvoice } from '@/components/services/invoices/service';
 import { ErrorText } from '@/styles/global';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface GenerateInvoiceModalProps {
   isOpen: boolean;
@@ -43,6 +43,7 @@ export function GenerateInvoiceModal({
   const [loading, setLoading] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const queryClient = useQueryClient();
 
   const { data: projectOptions = [], isLoading: projectsLoading } =
     useProjectOptions();
@@ -57,6 +58,7 @@ export function GenerateInvoiceModal({
   async function handleSubmit() {
     setLoading(true);
     setErrorMessage('');
+
     try {
       await createInvoice({
         projectId: Number(form.projectId),
@@ -64,6 +66,11 @@ export function GenerateInvoiceModal({
         periodStart: form.periodStart,
         periodEnd: form.periodEnd,
       });
+
+      await queryClient.invalidateQueries({
+        queryKey: ['invoices'],
+      });
+
       setSuccessOpen(true);
     } catch (error) {
       setErrorMessage(

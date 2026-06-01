@@ -119,6 +119,19 @@ export function ClientPieChart({
             <SkeletonLine $width="80px" />
           </SkeletonLegend>
         </>
+      ) : data.length === 0 ? (
+        <div
+          style={{
+            height: 350,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#7A7A7A',
+            fontSize: 14,
+          }}
+        >
+          Sem dados
+        </div>
       ) : (
         <ResponsiveContainer width="100%" height={350}>
           <PieChart margin={{ top: 10, right: 60, bottom: 10, left: 60 }}>
