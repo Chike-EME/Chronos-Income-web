@@ -1,8 +1,8 @@
 import {
   ProjectDetails,
   ProjectSelectOption,
-} from '@/components/types/calendar/addProject';
-import { ProjectCard } from '@/components/types/calendar/calendar';
+} from '@/components/types/calendar/type';
+import { ProjectCard } from '@/components/types/calendar/type';
 
 export const mockProjectOptions: ProjectSelectOption[] = [
   { id: '1', name: 'Site Institucional' },

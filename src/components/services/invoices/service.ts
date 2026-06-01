@@ -1,36 +1,26 @@
-import { mockInvoices } from '@/components/mock/invoice/mock';
+import { api } from '@/components/services/api/request';
 import {
   FetchInvoicesResponse,
   GenerateInvoicePayload,
+  Invoice,
 } from '@/components/types/invoices/types';
 
 export async function fetchInvoices(): Promise<FetchInvoicesResponse> {
-  await new Promise(res => setTimeout(res, 600));
-  return { invoices: mockInvoices };
+  const invoices = await api<Invoice[]>('/invoices');
+  return { invoices };
 }
 
 export async function deleteInvoice(id: string): Promise<void> {
-  await new Promise(res => setTimeout(res, 400));
-  console.log('[mock] deleteInvoice →', id);
+  await api(`/invoices/${id}`, { method: 'DELETE' });
 }
 
 export async function downloadInvoice(id: string): Promise<void> {
-  await new Promise(res => setTimeout(res, 400));
-  console.log('[mock] downloadInvoice →', id);
+  // TODO: implementar quando a rota de download estiver disponível
+  console.log('[invoices] downloadInvoice →', id);
 }
 
 export async function generateInvoice(
   payload: GenerateInvoicePayload,
 ): Promise<void> {
-  await new Promise(res => setTimeout(res, 800));
-  console.log('[mock] generateInvoice →', payload);
-
-  // quando integrar: receber blob e fazer download
-  // const blob = await api<Blob>('/invoices/generate', { method: 'POST', body: payload });
-  // const url = URL.createObjectURL(blob);
-  // const a = document.createElement('a');
-  // a.href = url;
-  // a.download = `invoice-${payload.dateFrom}-${payload.dateTo}.pdf`;
-  // a.click();
-  // URL.revokeObjectURL(url);
+  await api('/invoices', { method: 'POST', body: payload });
 }

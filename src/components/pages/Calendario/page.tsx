@@ -13,8 +13,8 @@ import {
   Wrapper,
 } from './styles';
 import { AddProjectModal } from '@/components/Modals/AddProject';
-import { CalendarDay } from '@/components/types/calendar/calendar';
-import { useProjectCards } from '@/components/services/calendar/useProjectsCards';
+import { CalendarDay } from '@/components/types/calendar/type';
+import { useProjectCards } from '@/components/services/calendar/timer/useTimeEntries';
 import { ProjectCard } from '@/components/Cards/Project';
 
 function getMonthDays(year: number, month: number): CalendarDay[] {

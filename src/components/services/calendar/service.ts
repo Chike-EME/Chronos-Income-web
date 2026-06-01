@@ -9,13 +9,13 @@ import {
   ProjectDetails,
   ProjectSelectOption,
   UpdateProjectCardResponse,
-} from '@/components/types/calendar/addProject';
+} from '@/components/types/calendar/type';
 import {
   ProjectCard,
   StartTimerResponse,
   StopTimerResponse,
   UpdateProjectCardPayload,
-} from '@/components/types/calendar/calendar';
+} from '@/components/types/calendar/type';
 
 export async function fetchProjectOptions(): Promise<ProjectSelectOption[]> {
   await new Promise(res => setTimeout(res, 500));

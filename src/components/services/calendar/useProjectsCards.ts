@@ -1,8 +1,4 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchProjectCardsByDate,
   deleteProjectCard,
@@ -11,7 +7,7 @@ import {
 import {
   ProjectCard,
   UpdateProjectCardPayload,
-} from '@/components/types/calendar/calendar';
+} from '@/components/types/calendar/type';
 
 export function useProjectCards(date: string) {
   const queryClient = useQueryClient();
@@ -42,9 +38,7 @@ export function useProjectCards(date: string) {
     }) => updateProjectCard(id, payload),
     onSuccess: updated => {
       queryClient.setQueryData<ProjectCard[]>(queryKey, prev =>
-        (prev ?? []).map(c =>
-          c.id === updated.id ? { ...c, ...updated } : c,
-        ),
+        (prev ?? []).map(c => (c.id === updated.id ? { ...c, ...updated } : c)),
       );
     },
   });

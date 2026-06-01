@@ -1,4 +1,3 @@
-// components/Cards/InvoiceCard/styles.ts
 import styled from 'styled-components';
 
 export const Card = styled.div`
@@ -24,6 +23,16 @@ export const Card = styled.div`
   }
 `;
 
+export const CardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  /* espaço para os botões no canto direito */
+  padding-right: 60px;
+`;
+
 export const CardTitle = styled.h3`
   margin: 0;
 
@@ -32,9 +41,27 @@ export const CardTitle = styled.h3`
   font-weight: 600;
 
   color: ${({ theme }) => theme.colors.primary[100]};
+`;
 
-  /* espaço para os botões no canto */
-  padding-right: 60px;
+interface CardBadgeProps {
+  $color: string;
+}
+
+export const CardBadge = styled.span<CardBadgeProps>`
+  flex-shrink: 0;
+
+  padding: 2px 10px;
+
+  border-radius: 99px;
+  border: 1px solid ${({ $color }) => $color};
+
+  font-size: 12px;
+  font-family: var(--font-lato);
+  font-weight: 500;
+
+  color: ${({ $color }) => $color};
+
+  background: transparent;
 `;
 
 export const CardProject = styled.span`
@@ -49,6 +76,28 @@ export const CardDate = styled.span`
   font-family: var(--font-lato);
   font-weight: 400;
   color: ${({ theme }) => theme.colors.neutral[60]};
+`;
+
+export const CardMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  margin-top: 4px;
+`;
+
+export const CardMetaItem = styled.span`
+  font-size: 13px;
+  font-family: var(--font-lato);
+  font-weight: 400;
+
+  color: ${({ theme }) => theme.colors.neutral[60]};
+
+  strong {
+    font-weight: 700;
+    font-size: 14px;
+    color: ${({ theme }) => theme.colors.neutral[100]};
+  }
 `;
 
 export const CardActions = styled.div`
