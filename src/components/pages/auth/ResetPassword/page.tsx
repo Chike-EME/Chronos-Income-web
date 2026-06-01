@@ -122,12 +122,20 @@ export default function ResetPassword() {
               '1 Letra maiúscula',
               '1 Letra minúscula',
               '1 Caractere especial',
-            ].map((label, i) => (
-              <Requirement key={i} $hasErrors={!passwordErrors.new[i]}>
-                <EllipseIcon $hasError={!passwordErrors.new[i]} />
-                <span>{label}</span>
-              </Requirement>
-            ))}
+            ].map((label, i) => {
+              console.log(
+                `req[${i}]`,
+                passwordErrors.new[i],
+                '→ $hasErrors:',
+                !passwordErrors.new[i],
+              );
+              return (
+                <Requirement key={i} $hasErrors={!passwordErrors.new[i]}>
+                  <EllipseIcon $hasError={!passwordErrors.new[i]} />
+                  <span>{label}</span>
+                </Requirement>
+              );
+            })}
           </RequirementsContainer>
 
           <Label>Confirmar nova senha</Label>

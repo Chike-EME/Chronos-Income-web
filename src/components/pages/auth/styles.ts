@@ -108,7 +108,7 @@ export const Requirement = styled.div<{ $hasErrors: boolean }>`
     font-family: var(--font-lato);
     font-weight: 600;
     color: ${({ $hasErrors, theme }) =>
-      $hasErrors ? theme.colors.error : theme.colors.primary[100]};
+      $hasErrors ? theme.colors.error.main : theme.colors.primary[100]};
   }
 `;
 
@@ -116,7 +116,7 @@ export const EllipseIcon = styled(Ellipse)<{ $hasError: boolean }>`
   width: 6px;
   height: 6px;
   color: ${({ $hasError, theme }) =>
-    $hasError ? theme.colors.error : theme.colors.primary[100]};
+    $hasError ? theme.colors.error.main : theme.colors.primary[100]};
 `;
 
 export const ButtonGroup = styled.div`

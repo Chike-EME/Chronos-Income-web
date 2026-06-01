@@ -73,6 +73,16 @@ const AuthProvider = ({ children }: ChildrenProps) => {
     }
   }, [loading, isAuthenticated, pathname]);
 
+  useEffect(() => {
+    console.log('pathname:', pathname);
+    console.log('isAuthenticated:', isAuthenticated);
+    console.log('loading:', loading);
+
+    if (!loading && !isAuthenticated && !publicRoutes.includes(pathname)) {
+      router.push('/');
+    }
+  }, [loading, isAuthenticated, pathname]);
+
   if (loading) return null;
 
   return (
