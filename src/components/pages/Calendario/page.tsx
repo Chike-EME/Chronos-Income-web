@@ -16,6 +16,7 @@ import { AddProjectModal } from '@/components/Modals/AddProject';
 import { CalendarDay } from '@/components/types/calendar/type';
 import { useProjectCards } from '@/components/services/calendar/timer/useTimeEntries';
 import { ProjectCard } from '@/components/Cards/Project';
+import { useQueryClient } from '@tanstack/react-query';
 
 function getMonthDays(year: number, month: number): CalendarDay[] {
   const days: CalendarDay[] = [];
@@ -48,12 +49,18 @@ export default function Calendario() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  function invalidateCards() {
+    queryClient.invalidateQueries({ queryKey: ['calendar', 'cards'] });
+  }
+
   const days = useMemo(() => {
     return getMonthDays(currentYear, currentMonth);
   }, [currentMonth, currentYear]);
 
   function DayCards({ date }: { date: string }) {
-    const { cards, remove, update } = useProjectCards(date);
+    const { cards, remove, update, invalidate } = useProjectCards(date);
     if (!cards.length) return null;
 
     return (
@@ -63,9 +70,11 @@ export default function Calendario() {
             key={card.id}
             card={card}
             onDelete={id => remove.mutate(id)}
-            onUpdated={(id, date, totalSeconds) =>
-              update.mutate({ id, payload: { date, totalSeconds } })
-            }
+            onUpdated={(id, payload) => {
+              update.mutate({ id, payload });
+              invalidate();
+            }}
+            onStopped={() => invalidate()}
           />
         ))}
       </>
@@ -161,7 +170,10 @@ export default function Calendario() {
       <AddProjectModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSubmit={() => setIsAddModalOpen(false)}
+        onSubmit={() => {
+          setIsAddModalOpen(false);
+          invalidateCards();
+        }}
       />
     </Wrapper>
   );

@@ -25,16 +25,14 @@ export const ScrollArea = styled.div`
   overflow-y: hidden;
 
   scrollbar-width: thin;
-  scrollbar-color: ${({ theme }) => theme.colors.primary[80]}
-    transparent;
+  scrollbar-color: ${({ theme }) => theme.colors.primary[80]} transparent;
 
   &::-webkit-scrollbar {
     height: 6px;
   }
 
   &::-webkit-scrollbar-track {
-    background: ${({ theme }) =>
-      theme.colors.primary[20] ?? '#e0ede0'};
+    background: ${({ theme }) => theme.colors.primary[20] ?? '#e0ede0'};
     border-radius: 999px;
   }
 
@@ -59,17 +57,26 @@ interface DayColumnProps {
 
 export const DayColumn = styled.div<DayColumnProps>`
   width: 200px;
-  min-height: calc(100vh - 220px);
+  height: calc(100vh - 220px);
 
   background: ${({ theme }) => theme.colors.primary[20] ?? '#dce8db'};
-
   border: 1px solid ${({ theme }) => theme.colors.primary[40]};
-
   border-radius: 18px;
 
   padding: 16px;
+  box-sizing: border-box;
 
   flex-shrink: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   cursor: pointer;
 
@@ -80,9 +87,7 @@ export const DayColumn = styled.div<DayColumnProps>`
 
   &:hover {
     transform: translateY(-2px);
-
     border-color: ${({ theme }) => theme.colors.primary[80]};
-
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 `;

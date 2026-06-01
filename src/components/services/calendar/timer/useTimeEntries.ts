@@ -1,10 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteTimeEntry, fetchAllTimeEntries } from './service';
+import {
+  deleteTimeEntry,
+  fetchAllTimeEntries,
+  updateTimeEntry,
+} from './service';
 import {
   ProjectCard,
   UpdateProjectCardPayload,
+  UpdateProjectCardResponse,
 } from '@/components/types/calendar/type';
-import { updateProjectCard } from '../service';
 
 const ALL_ENTRIES_KEY = ['calendar', 'cards'];
 
@@ -18,6 +22,10 @@ export function useProjectCards(date: string) {
   });
 
   const cards = query.data?.[date] ?? [];
+
+  function invalidate() {
+    queryClient.invalidateQueries({ queryKey: ALL_ENTRIES_KEY });
+  }
 
   const remove = useMutation({
     mutationFn: deleteTimeEntry,
@@ -36,23 +44,17 @@ export function useProjectCards(date: string) {
   });
 
   const update = useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: UpdateProjectCardPayload }) =>
-      updateProjectCard(id, payload),
-    onSuccess: updated => {
-      queryClient.setQueryData<Record<string, ProjectCard[]>>(
-        ALL_ENTRIES_KEY,
-        prev => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            [date]: (prev[date] ?? []).map(c =>
-              c.id === updated.id ? { ...c, ...updated } : c,
-            ),
-          };
-        },
-      );
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: UpdateProjectCardPayload;
+    }) => updateTimeEntry(id, payload),
+    onSuccess: (updated: UpdateProjectCardResponse) => {
+      queryClient.invalidateQueries({ queryKey: ALL_ENTRIES_KEY });
     },
   });
 
-  return { cards, isLoading: query.isLoading, remove, update };
+  return { cards, isLoading: query.isLoading, remove, update, invalidate };
 }

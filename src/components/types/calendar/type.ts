@@ -12,6 +12,8 @@ export type ProjectCard = {
   clientName: string;
   clientId: string;
   date: string;
+  startTime: string;
+  endTime: string;
   totalSeconds: number;
   isRunning: boolean;
   status: string;
@@ -30,9 +32,18 @@ export type StopTimerResponse = {
 };
 
 export type UpdateProjectCardPayload = {
-  date: string;
-  totalSeconds: number;
+  entryDate: string;
+  startTime: string;
+  endTime: string;
 };
+
+export interface UpdateProjectCardResponse {
+  id: string;
+  entryDate: string;
+  startTime: string;
+  endTime: string;
+  duration: string;
+}
 
 /* ---------------- Add Timer ---------------- */
 
@@ -72,17 +83,11 @@ export type AddProjectResponse = {
   date?: string;
 };
 
-export interface UpdateProjectCardResponse {
-  id: string;
-  date: string;
-  totalSeconds: number;
-}
-
 export interface TimeEntryAPI {
   id: number;
   entryDate: string;
   startTime: string;
-  endTime: string;
+  endTime: string | null;
   duration: string;
   type: string;
   timerStatus: 'RUNNING' | 'STOPPED' | 'PAUSED';
@@ -95,4 +100,31 @@ export interface TimeEntryAPI {
   clientName: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ProjectSummaryAPI {
+  id: number;
+  name: string;
+}
+
+export interface ProjectByIdAPI {
+  id: number;
+  name: string;
+  color: string;
+  hourlyRate: number;
+  description: string;
+  startDate: string;
+  status: string;
+  clientId: number;
+  clientName: string;
+  totalHours: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTimerPayload {
+  projectId: number;
+  entryDate: string;
+  description: string;
+  startPaused: boolean;
 }

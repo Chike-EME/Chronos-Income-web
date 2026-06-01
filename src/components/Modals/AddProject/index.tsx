@@ -1,8 +1,7 @@
 import {
   useProjectDetails,
   useProjectOptions,
-} from '@/components/services/calendar/useProjects';
-import { ProjectFormData } from '@/components/types/calendar/type';
+} from '@/components/services/calendar/projects/useProjects';
 import { useState } from 'react';
 import {
   ChevronIcon,
@@ -23,13 +22,14 @@ import {
   SubmitButton,
   Title,
 } from './styles';
-import { addProject } from '@/components/services/calendar/service';
+import { createTimer } from '@/components/services/calendar/projects/service';
 import { Modal } from '..';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AddProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: ProjectFormData) => void;
+  onSubmit: () => void;
 }
 
 type ModalType = { type: 'none' } | { type: 'success' } | { type: 'error' };
@@ -39,16 +39,13 @@ export function AddProjectModal({
   onClose,
   onSubmit,
 }: AddProjectModalProps) {
+  const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState('');
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
+  const [timerDescription, setTimerDescription] = useState('');
   const [modal, setModal] = useState<ModalType>({ type: 'none' });
-
   const [submitting, setSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<{
-    success: boolean;
-    message: string;
-  } | null>(null);
 
   const { data: projectOptions = [], isLoading: optionsLoading } =
     useProjectOptions();
@@ -59,43 +56,38 @@ export function AddProjectModal({
 
   const ready = !!details && !detailsLoading;
 
-  function handleProjectChange(id: string) {
-    setSelectedId(id);
-  }
-
   async function handleSubmit() {
-    if (!details || !selectedId || !date) return;
+    if (!selectedId || !date) return;
 
     setSubmitting(true);
-    setFeedback(null);
-
     try {
-      const response = await addProject({
-        projectId: selectedId,
-        date,
-      });
-      setFeedback({
-        success: response.success,
-        message: response.message,
+      await createTimer({
+        projectId: Number(selectedId),
+        entryDate: date,
+        description: timerDescription.trim() || details?.description || '',
+        startPaused: true,
       });
 
-      if (response.success) {
-        setModal({ type: 'success' });
-        setTimeout(() => {
-          setFeedback(null);
-          setSelectedId('');
-          setDate(today);
-        }, 1200);
-      } else {
-        setModal({ type: 'error' });
-      }
+      queryClient.invalidateQueries({ queryKey: ['calendar', 'cards', date] });
+
+      setModal({ type: 'success' });
+    } catch {
+      setModal({ type: 'error' });
     } finally {
       setSubmitting(false);
     }
   }
 
+  function handleClose() {
+    setSelectedId('');
+    setDate(today);
+    setTimerDescription('');
+    setModal({ type: 'none' });
+    onClose();
+  }
+
   function handleOverlayClick(e: React.MouseEvent<HTMLDivElement>) {
-    if (e.target === e.currentTarget) onClose();
+    if (e.target === e.currentTarget) handleClose();
   }
 
   return (
@@ -103,7 +95,7 @@ export function AddProjectModal({
       <ModalContainer>
         <Header>
           <Title>Adicionar projeto</Title>
-          <CloseButton onClick={onClose} aria-label="Fechar">
+          <CloseButton onClick={handleClose} aria-label="Fechar">
             <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
         </Header>
@@ -114,7 +106,7 @@ export function AddProjectModal({
             <SelectWrapper>
               <Select
                 value={selectedId}
-                onChange={e => handleProjectChange(e.target.value)}
+                onChange={e => setSelectedId(e.target.value)}
                 disabled={optionsLoading}
               >
                 <option value="" disabled>
@@ -138,6 +130,16 @@ export function AddProjectModal({
               type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
+              disabled={!ready}
+            />
+          </Field>
+
+          <Field>
+            <Label>Descrição do timer (opcional)</Label>
+            <Input
+              value={timerDescription}
+              onChange={e => setTimerDescription(e.target.value)}
+              placeholder="Ex: Desenvolvimento backend"
               disabled={!ready}
             />
           </Field>
@@ -175,7 +177,7 @@ export function AddProjectModal({
                 {details ? (
                   <ColorRow>
                     <ColorSwatch $color={details.color} />
-                    {details.colorLabel ?? details.color}
+                    {details.color}
                   </ColorRow>
                 ) : (
                   'Selecione um projeto'
@@ -185,7 +187,7 @@ export function AddProjectModal({
           </Field>
 
           <Field>
-            <Label>Descrição</Label>
+            <Label>Descrição do projeto</Label>
             {detailsLoading ? (
               <LoadingShimmer />
             ) : (
@@ -196,31 +198,33 @@ export function AddProjectModal({
           </Field>
         </ScrollArea>
 
-        <SubmitButton onClick={handleSubmit} disabled={!ready || !date}>
-          Concluir
+        <SubmitButton
+          onClick={handleSubmit}
+          disabled={!ready || !date || submitting}
+        >
+          {submitting ? 'Salvando...' : 'Concluir'}
         </SubmitButton>
       </ModalContainer>
+
       <Modal
         isOpen={modal.type !== 'none'}
         variant={modal.type === 'success' ? 'success' : 'danger'}
         onClose={() => {
           setModal({ type: 'none' });
-          if (modal.type === 'success') {
-          }
+          if (modal.type === 'success') handleClose();
         }}
         onConfirm={() => {
-          if (modal.type === 'error') {
+          if (modal.type === 'success') {
             setModal({ type: 'none' });
-          } else {
-            setModal({ type: 'none' });
-            onClose();
-          }
+            handleClose();
+            onSubmit();
+          } else setModal({ type: 'none' });
         }}
-        customTitle={modal.type === 'success' ? 'Projeto vinculado!' : 'Erro'}
+        customTitle={modal.type === 'success' ? 'Timer criado!' : 'Erro'}
         message={
           modal.type === 'success'
-            ? 'Projeto vinculado ao dia selecionado com sucesso.'
-            : 'Erro ao vincular projeto, por favor tente novamente.'
+            ? 'Timer iniciado com sucesso. O card aparecerá no dia selecionado.'
+            : 'Erro ao criar timer, por favor tente novamente.'
         }
         customClose="none"
         customConfirm={modal.type === 'success' ? 'Fechar' : 'Voltar'}

@@ -95,13 +95,9 @@ export const TimerRow = styled.div`
   margin-top: 4px;
 `;
 
-interface PlayButtonProps {
-  $running: boolean;
-}
-
-export const PlayButton = styled.button<PlayButtonProps>`
-  width: 28px;
-  height: 28px;
+export const PlayButton = styled.button`
+  width: 16px;
+  height: 16px;
   border: none;
   background: transparent;
   cursor: pointer;

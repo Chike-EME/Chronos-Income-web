@@ -18,21 +18,20 @@ interface EditProjectModalProps {
   onClose: () => void;
   initialValues: {
     date: string;
-    totalSeconds: number;
+    startTime: string; // HH:MM:SS
+    endTime: string; // HH:MM:SS
   };
   onSubmit: (payload: UpdateProjectCardPayload) => void;
 }
 
-function secondsToTime(totalSeconds: number): string {
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
+// garante formato HH:MM para input type="time"
+function toTimeInput(time: string): string {
+  return time.substring(0, 5); // "09:00:00" → "09:00"
 }
 
-function timeToSeconds(time: string): number {
-  const [h = '0', m = '0', s = '0'] = time.split(':');
-  return Number(h) * 3600 + Number(m) * 60 + Number(s);
+// adiciona segundos para enviar à API
+function toTimeAPI(time: string): string {
+  return time.length === 5 ? `${time}:00` : time;
 }
 
 export function EditProjectModal({
@@ -42,7 +41,10 @@ export function EditProjectModal({
   onSubmit,
 }: EditProjectModalProps) {
   const [date, setDate] = useState(initialValues.date);
-  const [time, setTime] = useState(secondsToTime(initialValues.totalSeconds));
+  const [startTime, setStartTime] = useState(
+    toTimeInput(initialValues.startTime),
+  );
+  const [endTime, setEndTime] = useState(toTimeInput(initialValues.endTime));
 
   if (!isOpen) return null;
 
@@ -51,16 +53,24 @@ export function EditProjectModal({
   }
 
   function handleSubmit() {
-    onSubmit({ date, totalSeconds: timeToSeconds(time) });
+    onSubmit({
+      entryDate: date,
+      startTime: toTimeAPI(startTime),
+      endTime: toTimeAPI(endTime),
+    });
   }
 
-  const isValid = !!date.trim() && /^\d{2}:\d{2}:\d{2}$/.test(time);
+  const isValid =
+    !!date.trim() &&
+    /^\d{2}:\d{2}$/.test(startTime) &&
+    /^\d{2}:\d{2}$/.test(endTime) &&
+    startTime < endTime;
 
   return (
     <Overlay onClick={handleOverlayClick}>
       <Modal>
         <Header>
-          <Title>Editar projeto</Title>
+          <Title>Editar timer</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
             <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
@@ -76,13 +86,26 @@ export function EditProjectModal({
             />
           </Field>
           <Field>
-            <Label>Tempo decorrido</Label>
+            <Label>Hora de início</Label>
             <Input
-              value={time}
-              onChange={e => setTime(e.target.value)}
-              placeholder="HH:MM:SS"
+              type="time"
+              value={startTime}
+              onChange={e => setStartTime(e.target.value)}
             />
           </Field>
+          <Field>
+            <Label>Hora de fim</Label>
+            <Input
+              type="time"
+              value={endTime}
+              onChange={e => setEndTime(e.target.value)}
+            />
+          </Field>
+          {startTime >= endTime && startTime && endTime && (
+            <span style={{ fontSize: 12, color: '#b91c1c' }}>
+              Hora de fim deve ser maior que hora de início.
+            </span>
+          )}
         </ScrollArea>
 
         <SubmitButton onClick={handleSubmit} disabled={!isValid}>
