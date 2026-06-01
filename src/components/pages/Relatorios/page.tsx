@@ -12,9 +12,7 @@ import { ReportFilter } from '@/components/types/reports/types';
 export default function Relatorios() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<
-    Partial<ReportFilter>
-  >({});
+  const [activeFilter, setActiveFilter] = useState<Partial<ReportFilter>>({});
 
   const buttonText = currentDate.toLocaleString('pt-BR', {
     month: 'long',
@@ -29,14 +27,10 @@ export default function Relatorios() {
         type="Relatórios"
         buttonText={buttonText}
         onPrevMonth={() =>
-          setCurrentDate(
-            d => new Date(d.getFullYear(), d.getMonth() - 1),
-          )
+          setCurrentDate(d => new Date(d.getFullYear(), d.getMonth() - 1))
         }
         onNextMonth={() =>
-          setCurrentDate(
-            d => new Date(d.getFullYear(), d.getMonth() + 1),
-          )
+          setCurrentDate(d => new Date(d.getFullYear(), d.getMonth() + 1))
         }
         onAddClick={() => console.log('Gerar Relatório')}
         onFilterClick={() => setIsFilterOpen(true)}
@@ -52,13 +46,13 @@ export default function Relatorios() {
           />
           <SummaryCard
             icon="/img/EmitidoIcon.svg"
-            label="Valores Emitidos"
+            label="Valores Pagos"
             value={data?.totalEmitted ?? 0}
             loading={isLoading}
           />
           <SummaryCard
             icon="/img/AlertIcon.svg"
-            label="Valores Não Emitidos"
+            label="Valores Pendentes"
             value={data?.totalNotEmitted ?? 0}
             loading={isLoading}
           />
@@ -66,13 +60,13 @@ export default function Relatorios() {
 
         <ChartsRow>
           <ClientPieChart
-            title="Valores Emitidos"
+            title="Valores Pagos"
             total={data?.totalEmitted ?? 0}
             data={data?.emitted ?? []}
             loading={isLoading}
           />
           <ClientPieChart
-            title="Valores Não Emitidos"
+            title="Valores Pendentes"
             total={data?.totalNotEmitted ?? 0}
             data={data?.notEmitted ?? []}
             loading={isLoading}

@@ -19,7 +19,7 @@ import {
   ClearButton,
 } from './styles';
 import { useState } from 'react';
-import { useProjectOptions } from '@/components/services/calendar/useProjects';
+import { useProjectOptions } from '@/components/services/calendar/projects/useProjects';
 
 interface ReportFilterModalProps {
   isOpen: boolean;
@@ -69,12 +69,7 @@ export function ReportFilterModal({
         <Header>
           <Title>Filtro</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
-            <img
-              src="/img/CloseIcon.svg"
-              alt="fechar"
-              width={24}
-              height={24}
-            />
+            <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
         </Header>
 
@@ -86,9 +81,7 @@ export function ReportFilterModal({
                 <Label>De</Label>
                 <Input
                   value={form.dateFrom ?? ''}
-                  onChange={e =>
-                    handleChange('dateFrom', e.target.value)
-                  }
+                  onChange={e => handleChange('dateFrom', e.target.value)}
                   placeholder="DD/MM/AAAA"
                 />
               </PeriodField>
@@ -96,9 +89,7 @@ export function ReportFilterModal({
                 <Label>Até</Label>
                 <Input
                   value={form.dateTo ?? ''}
-                  onChange={e =>
-                    handleChange('dateTo', e.target.value)
-                  }
+                  onChange={e => handleChange('dateTo', e.target.value)}
                   placeholder="DD/MM/AAAA"
                 />
               </PeriodField>
@@ -109,9 +100,7 @@ export function ReportFilterModal({
             <Label>Nome do Cliente</Label>
             <Input
               value={form.clientName ?? ''}
-              onChange={e =>
-                handleChange('clientName', e.target.value)
-              }
+              onChange={e => handleChange('clientName', e.target.value)}
               placeholder="Insira o nome do cliente"
             />
           </Field>
@@ -121,9 +110,7 @@ export function ReportFilterModal({
             <SelectWrapper>
               <Select
                 value={form.projectId ?? ''}
-                onChange={e =>
-                  handleChange('projectId', e.target.value)
-                }
+                onChange={e => handleChange('projectId', e.target.value)}
                 disabled={projectsLoading}
               >
                 <option value="">
@@ -136,12 +123,7 @@ export function ReportFilterModal({
                 ))}
               </Select>
               <ChevronIcon>
-                <img
-                  src="/img/ChevronDown.svg"
-                  alt=""
-                  width={16}
-                  height={16}
-                />
+                <img src="/img/ChevronDown.svg" alt="" width={16} height={16} />
               </ChevronIcon>
             </SelectWrapper>
           </Field>

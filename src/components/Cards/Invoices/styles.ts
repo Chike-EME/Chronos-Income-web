@@ -28,9 +28,6 @@ export const CardHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-
-  /* espaço para os botões no canto direito */
-  padding-right: 60px;
 `;
 
 export const CardTitle = styled.h3`
@@ -142,3 +139,10 @@ export const ActionButton = styled.button<ActionButtonProps>`
     $danger &&
     `img { filter: invert(27%) sepia(90%) saturate(600%) hue-rotate(330deg); }`}
 `;
+
+export {
+  BadgeWrapper,
+  Badge,
+  Dropdown,
+  DropdownItem,
+} from '@/components/Modals/ClientDetails/styles';
