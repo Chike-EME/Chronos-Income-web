@@ -17,6 +17,7 @@ import { CalendarDay } from '@/components/types/calendar/type';
 import { useProjectCards } from '@/components/services/calendar/timer/useTimeEntries';
 import { ProjectCard } from '@/components/Cards/Project';
 import { useQueryClient } from '@tanstack/react-query';
+import { getTodayString } from '@/utils/date';
 
 function getMonthDays(year: number, month: number): CalendarDay[] {
   const days: CalendarDay[] = [];
@@ -42,7 +43,7 @@ function getMonthDays(year: number, month: number): CalendarDay[] {
 
 export default function Calendario() {
   const today = new Date();
-  const todayString = today.toISOString().split('T')[0];
+  const todayString = getTodayString();
   const todayRef = useRef<HTMLDivElement | null>(null);
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -55,9 +56,10 @@ export default function Calendario() {
     queryClient.invalidateQueries({ queryKey: ['calendar', 'cards'] });
   }
 
-  const days = useMemo(() => {
-    return getMonthDays(currentYear, currentMonth);
-  }, [currentMonth, currentYear]);
+  const days = useMemo(
+    () => getMonthDays(currentYear, currentMonth),
+    [currentMonth, currentYear],
+  );
 
   function DayCards({ date }: { date: string }) {
     const { cards, remove, update, invalidate } = useProjectCards(date);

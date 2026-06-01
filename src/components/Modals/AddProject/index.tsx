@@ -25,6 +25,7 @@ import {
 import { createTimer } from '@/components/services/calendar/projects/service';
 import { Modal } from '..';
 import { useQueryClient } from '@tanstack/react-query';
+import { getTodayString } from '@/utils/date';
 
 interface AddProjectModalProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export function AddProjectModal({
 }: AddProjectModalProps) {
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState('');
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayString();
   const [date, setDate] = useState(today);
   const [timerDescription, setTimerDescription] = useState('');
   const [modal, setModal] = useState<ModalType>({ type: 'none' });
