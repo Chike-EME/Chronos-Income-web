@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { EditProjectModal } from '@/components/Modals/EditProject';
-import { ProjectCard as ProjectCardType } from '@/components/types/calendar/calendar';
+import { EditProjectModal } from '@/components/Modals/EditProjectTimer';
+import { ProjectCard as ProjectCardType } from '@/components/types/calendar/type';
 import {
   startTimer,
   stopTimer,

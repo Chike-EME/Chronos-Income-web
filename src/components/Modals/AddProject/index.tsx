@@ -2,7 +2,7 @@ import {
   useProjectDetails,
   useProjectOptions,
 } from '@/components/services/calendar/useProjects';
-import { ProjectFormData } from '@/components/types/calendar/addProject';
+import { ProjectFormData } from '@/components/types/calendar/type';
 import { useState } from 'react';
 import {
   ChevronIcon,
@@ -32,10 +32,7 @@ interface AddProjectModalProps {
   onSubmit: (data: ProjectFormData) => void;
 }
 
-type ModalType =
-  | { type: 'none' }
-  | { type: 'success' }
-  | { type: 'error' };
+type ModalType = { type: 'none' } | { type: 'success' } | { type: 'error' };
 
 export function AddProjectModal({
   isOpen,
@@ -107,12 +104,7 @@ export function AddProjectModal({
         <Header>
           <Title>Adicionar projeto</Title>
           <CloseButton onClick={onClose} aria-label="Fechar">
-            <img
-              src="/img/CloseIcon.svg"
-              alt="fechar"
-              width={24}
-              height={24}
-            />
+            <img src="/img/CloseIcon.svg" alt="fechar" width={24} height={24} />
           </CloseButton>
         </Header>
 
@@ -135,12 +127,7 @@ export function AddProjectModal({
                 ))}
               </Select>
               <ChevronIcon>
-                <img
-                  src="/img/ChevronDown.svg"
-                  alt=""
-                  width={16}
-                  height={16}
-                />
+                <img src="/img/ChevronDown.svg" alt="" width={16} height={16} />
               </ChevronIcon>
             </SelectWrapper>
           </Field>
@@ -209,10 +196,7 @@ export function AddProjectModal({
           </Field>
         </ScrollArea>
 
-        <SubmitButton
-          onClick={handleSubmit}
-          disabled={!ready || !date}
-        >
+        <SubmitButton onClick={handleSubmit} disabled={!ready || !date}>
           Concluir
         </SubmitButton>
       </ModalContainer>
@@ -232,9 +216,7 @@ export function AddProjectModal({
             onClose();
           }
         }}
-        customTitle={
-          modal.type === 'success' ? 'Projeto vinculado!' : 'Erro'
-        }
+        customTitle={modal.type === 'success' ? 'Projeto vinculado!' : 'Erro'}
         message={
           modal.type === 'success'
             ? 'Projeto vinculado ao dia selecionado com sucesso.'

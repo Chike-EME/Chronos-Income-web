@@ -134,7 +134,7 @@ export const Input = styled.input.withConfig({
 })<{ hasError?: boolean }>`
   border: 1px solid
     ${({ theme, hasError }) =>
-      hasError ? theme.colors.error : theme.colors.neutral[20]};
+      hasError ? theme.colors.error.main : theme.colors.neutral[20]};
   background: ${({ theme }) => theme.colors.white};
   border-radius: 8px;
 
@@ -167,7 +167,7 @@ export const ErrorMessage = styled.span`
   font-size: 16;
   font-family: var(--font-poppins);
   font-weight: 400;
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.error.main};
 `;
 
 export const ErrorText = styled.p`
@@ -227,7 +227,7 @@ export const DividerVertical = styled.div`
 export const ProjectsRow = styled.div`
   display: grid;
 
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 
   gap: 16px;
 

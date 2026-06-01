@@ -6,7 +6,10 @@ import {
   CreateClientResponse,
   CreateProjectPayload,
   CreateProjectResponse,
+  EditProjectPayload,
+  Project,
   ProjectAPI,
+  ProjectStatus,
   ProjectSummary,
 } from '@/components/types/clients/types';
 import { api } from '../api/request';
@@ -35,14 +38,18 @@ export async function deleteClient(id: string): Promise<void> {
 
 /* ---------------- Client Details ---------------- */
 
-function toProjectSummary(p: ProjectAPI): ProjectSummary {
+function toProjectSummary(p: ProjectAPI): Project {
   return {
-    id: String(p.id),
+    id: p.id,
     name: p.name,
     description: p.description,
     client: p.clientName,
     color: p.color,
     totalHours: formatHours(p.totalHours),
+    hourlyRate: p.hourlyRate,
+    startDate: p.startDate,
+    status: p.status,
+    clientId: String(p.clientId),
   };
 }
 
@@ -83,5 +90,29 @@ export async function createProject(
   return api<CreateProjectResponse>('/projects', {
     method: 'POST',
     body: payload,
+  });
+}
+
+/* ---------------- Edit Project ---------------- */
+
+export async function editProject(id: number, payload: EditProjectPayload) {
+  return api(`/projects/${id}`, { method: 'PUT', body: payload });
+}
+
+/* ---------------- Delete Project ---------------- */
+
+export async function deleteProject(id: number): Promise<void> {
+  await api(`/projects/${id}`, { method: 'DELETE' });
+}
+
+/* ---------------- Update Project Status ---------------- */
+
+export async function updateProjectStatus(
+  id: number,
+  status: ProjectStatus,
+): Promise<void> {
+  await api(`/projects/${id}/status`, {
+    method: 'PATCH',
+    body: { status },
   });
 }

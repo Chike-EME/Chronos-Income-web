@@ -62,6 +62,16 @@ export default function Clientes() {
     },
   });
 
+  async function refreshClientDetails() {
+    if (!detailsModal.client?.id) return;
+    const data = await fetchClientDetails(detailsModal.client.id, {
+      name: detailsModal.client.name,
+      cnpj: detailsModal.client.cnpj,
+      description: detailsModal.client.description,
+    });
+    setDetailsModal(prev => ({ ...prev, client: data }));
+  }
+
   function handleDelete(id: string) {
     deleteClient.mutate(id);
   }
@@ -184,24 +194,19 @@ export default function Clientes() {
       <ClientDetailsModal
         isOpen={detailsModal.open}
         onClose={() =>
-          setDetailsModal({
-            open: false,
-            client: null,
-            loading: false,
-          })
+          setDetailsModal({ open: false, client: null, loading: false })
         }
         client={detailsModal.client}
         loading={detailsModal.loading}
         onAddProject={() => setCreateProjectOpen(true)}
+        onProjectEdited={refreshClientDetails}
       />
 
       <CreateProjectModal
         isOpen={createProjectOpen}
         clientId={detailsModal.client?.id ?? ''}
         onClose={() => setCreateProjectOpen(false)}
-        onSuccess={() => {
-          setCreateProjectOpen(false);
-        }}
+        onSuccess={refreshClientDetails}
       />
 
       <Modal

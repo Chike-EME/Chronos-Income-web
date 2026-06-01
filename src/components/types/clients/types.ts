@@ -6,14 +6,20 @@ export type Client = {
   description?: string;
 };
 
-export type ProjectSummary = {
-  id: string;
+export type Project = {
+  id: number;
   name: string;
-  description?: string;
+  color: string;
+  hourlyRate: number;
+  description: string;
+  startDate: string;
+  status: string; //ACTIVE OR INACTIVE OR COMPLETED
+  clientId: string;
   client: string;
   totalHours: string;
-  color: string;
 };
+
+export type ProjectSummary = Project;
 
 export type ClientDetails = {
   id: string;
@@ -24,7 +30,7 @@ export type ClientDetails = {
   projects: ProjectSummary[];
 };
 
-export interface ClientAPI {
+export type ClientAPI = {
   id: number;
   name: string;
   fiscalId: string;
@@ -32,30 +38,30 @@ export interface ClientAPI {
   projectCount: number;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 /* ---------------- Create Client ---------------- */
 
-export interface CreateClientPayload {
+export type CreateClientPayload = {
   name: string;
   fiscalId: string;
   description: string;
-}
+};
 
-export interface CreateClientResponse {
+export type CreateClientResponse = {
   id: number;
   name: string;
   fiscalId: string;
   description: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export interface ApiError {
+export type ApiError = {
   timestamp: string;
   status: number;
   error: string;
-}
+};
 
 /* ---------------- Projects ---------------- */
 
@@ -74,16 +80,16 @@ export type ProjectAPI = {
   updatedAt: string;
 };
 
-export interface CreateProjectPayload {
+export type CreateProjectPayload = {
   name: string;
   color: string;
   hourlyRate: number;
   description: string;
   startDate: string;
   clientId: string;
-}
+};
 
-export interface CreateProjectResponse {
+export type CreateProjectResponse = {
   id: number;
   name: string;
   color: string;
@@ -95,4 +101,15 @@ export interface CreateProjectResponse {
   clientName: string;
   createdAt: string;
   updatedAt: string;
-}
+};
+
+export type EditProjectPayload = {
+  name: string;
+  color: string;
+  hourlyRate: number;
+  description: string;
+  startDate: string;
+  clientId: string;
+};
+
+export type ProjectStatus = 'ACTIVE' | 'INACTIVE' | 'COMPLETED';
