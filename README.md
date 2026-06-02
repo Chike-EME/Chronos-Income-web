@@ -100,6 +100,7 @@ chronos-income/
 │   ├── Cards/              # Componentes de card
 │   ├── Charts/             # Gráficos
 │   ├── Modals/             # Modais
+│   ├── Pages/              # Páginas
 │   ├── Skeletons/          # Loading skeletons
 │   └── Header/             # Header e navegação
 ├── services/
