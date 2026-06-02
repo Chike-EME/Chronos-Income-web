@@ -1,3 +1,4 @@
+// components/Modals/AddClient/index.tsx
 import { useState } from 'react';
 import {
   Overlay,
@@ -13,6 +14,7 @@ import {
 } from './styles';
 import { useCreateClient } from '@/components/services/clients/useCreateClient';
 import { ErrorText } from '@/styles/global';
+import { maskFiscalId, isValidFiscalId } from '@/utils/fiscalId';
 
 interface AddClientModalProps {
   isOpen: boolean;
@@ -41,7 +43,11 @@ export function AddClientModal({
   if (!isOpen) return null;
 
   function handleChange(field: keyof typeof form, value: string) {
-    setForm(prev => ({ ...prev, [field]: value }));
+    if (field === 'cnpj') {
+      setForm(prev => ({ ...prev, cnpj: maskFiscalId(value) }));
+    } else {
+      setForm(prev => ({ ...prev, [field]: value }));
+    }
     if (errorMessage) setErrorMessage('');
   }
 
@@ -57,7 +63,9 @@ export function AddClientModal({
     if (e.target === e.currentTarget) onClose();
   }
 
-  const isValid = form.name.trim() !== '' && form.cnpj.trim() !== '';
+  const fiscalIdValid = isValidFiscalId(form.cnpj);
+  const isValid =
+    form.name.trim() !== '' && form.cnpj.trim() !== '' && fiscalIdValid;
 
   return (
     <Overlay onClick={handleOverlayClick}>
@@ -84,7 +92,8 @@ export function AddClientModal({
             <Input
               value={form.cnpj}
               onChange={e => handleChange('cnpj', e.target.value)}
-              placeholder="Insira o CNPJ/EIN"
+              placeholder="00.000.000/0000-00 ou EIN"
+              maxLength={18}
             />
           </Field>
 
