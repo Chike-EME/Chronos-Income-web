@@ -89,28 +89,29 @@ Acesse [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Estrutura do projeto
 
+```
 chronos-income/
-├── app/ # Páginas (App Router)
-│ ├── calendario/ # Calendário com timers
-│ ├── clientes/ # Gerenciamento de clientes
-│ ├── invoice/ # Invoices
-│ └── relatorios/ # Relatórios
+├── app/
+│   ├── calendario/         # Calendário com timers
+│   ├── clientes/           # Gerenciamento de clientes
+│   ├── invoice/            # Invoices
+│   └── relatorios/         # Relatórios
 ├── components/
-│ ├── Cards/ # Componentes de card
-│ ├── Charts/ # Gráficos
-│ ├── Modals/ # Modais
-│ ├── Pages/ # Páginas
-│ ├── Skeletons/ # Loading skeletons
-│ └── Header/ # Header e navegação
-├── services/ # Integração com API
-│ ├── auth/ # Autenticação
-│ ├── clients/ # Clientes
-│ ├── invoices/ # Invoices
-│ ├── projects/ # Projetos
-│ └── reports/ # Relatórios
-├── hooks/ # Hooks customizados
-├── utils/ # Utilitários (datas, etc.)
-└── public/ # Arquivos estáticos
+│   ├── Cards/              # Componentes de card
+│   ├── Charts/             # Gráficos
+│   ├── Modals/             # Modais
+│   ├── Skeletons/          # Loading skeletons
+│   └── Header/             # Header e navegação
+├── services/
+│   ├── auth/               # Autenticação
+│   ├── clients/            # Clientes
+│   ├── invoices/           # Invoices
+│   ├── projects/           # Projetos
+│   └── reports/            # Relatórios
+├── hooks/                  # Hooks customizados
+├── utils/                  # Utilitários (datas, etc.)
+└── public/                 # Arquivos estáticos
+```
 
 ---
 
